@@ -75,8 +75,7 @@ The dump, write and boot-log scripts pick the USB-serial port themselves when ex
 (`/dev/cu.usbmodem*`, `/dev/ttyACM*`, `/dev/ttyUSB*`) is present; pass `--port <path>` to choose
 another. `typer`, `construct` and `pycryptodomex` are imported by ltchiptool's AmbZ2 image code (the
 build and `scripts/ambz2_split.py` need them); `cryptography` signs OTA images
-(`firmware/tools/ota_keygen.py`, `ota_push.py`). `scripts/ble_btp_check.py`, a host-side check for
-the `libs/ble-probe` BLE test build, also needs `pip install bleak`.
+(`firmware/tools/ota_keygen.py`, `ota_push.py`).
 
 `scripts/ambz2_dump.py` and `scripts/ambz2_write.py` exist because ltchiptool's own read/write
 uses large chunks and short timeouts that fail through slow USB-UART bridges: they move 4 KiB
@@ -89,7 +88,7 @@ bootloader @0x4000, FW1 @0x10000, FW2 @0xF0000, Tuya KV @0x1D0000 (nothing encry
 Build (see the README), then write the full image that also wipes the old Tuya data:
 
 ```sh
-.venv-flash/bin/python scripts/ambz2_write.py firmware/out/image_flash_wipe.0x000000.bin
+.venv-flash/bin/python scripts/ambz2_write.py firmware/out-matter/<unit>/image_flash_wipe.0x000000.bin
 ```
 
 After that, updates go over Wi-Fi (`firmware/tools/ota_push.py`), Ed25519-signed with your own key,
