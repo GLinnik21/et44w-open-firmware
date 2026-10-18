@@ -55,7 +55,7 @@ What each package is for:
 - `ltchiptool` packs the flash images. It needs `typer`, `construct` and `pycryptodomex`, which its AmbZ2
   image code imports.
 - `pyserial` is for the flashing scripts.
-- `cryptography` signs OTA images and generates the Matter setup.
+- `cryptography` generates the OTA signing key and signs OTA images.
 
 ltchiptool needs Python 3.10 or newer. macOS's `/usr/bin/python3` is 3.9, so name a newer interpreter for
 the venv. The Arm GNU toolchain is downloaded (SHA-pinned) on the first `make`.
@@ -69,11 +69,12 @@ They are git-ignored. Each `.example` file next to them describes its format.
 # it has no network from Apple Home yet, and falls back to it as a rescue after the Bluetooth window.
 cp apps/thermostat-matter/wifi_credentials.h.example apps/thermostat-matter/wifi_credentials.h
 
-# OTA signing key, once: writes ../secrets/ota_signing.key (git-ignored) and the public header.
+# OTA signing key, once: writes ../secrets/ota_signing.key (git-ignored; the folder is created) and the public header.
 # Back the key up: without it, updates need the serial wires again.
 ../.venv-flash/bin/python tools/ota_keygen.py ../secrets/ota_signing.key apps/thermostat-matter/ota_pubkey.h
 
-# Matter setup: the passcode, QR payload and manual code go only to SETUP_TXT (keep it out of the repo)
+# Matter setup: the passcode, QR payload and manual code go only to SETUP_TXT (keep it out of the repo;
+# ../secrets exists after the step above)
 make UNIT=example SERIAL=000000000001 SETUP_TXT=../secrets/example_matter_setup.txt matter-unit
 ```
 
@@ -137,8 +138,8 @@ Layering rules and design decisions are in [`firmware/ARCHITECTURE.md`](firmware
 
 ## Caveats
 
-- **Not certified by Apple or the CSA.** Apple Home shows an "Uncertified Accessory" prompt and names the
-  accessory "Matter Accessory" until you rename it. The build uses the official *test* vendor ID and test
+- **Not certified by Apple or the CSA.** Apple Home shows an "Uncertified Accessory" prompt, and iOS lists
+  the device as "Matter Accessory" (the test vendor has no name). The build uses the official *test* vendor ID and test
   attestation certificates. That's fine for your own home, not for a product.
 - **The Matter stack is young.** It's a new, compact implementation of a security protocol. It works with
   Apple Home on iOS but hasn't had an independent security review.

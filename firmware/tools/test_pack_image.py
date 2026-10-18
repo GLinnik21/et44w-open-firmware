@@ -1,7 +1,7 @@
 """Host tests for the flash map and image packer (no hardware). Run with ltchiptool available:
     ../.venv-flash/bin/python -m unittest tools/test_pack_image.py   (from firmware/)
 """
-import io, os, shutil, subprocess, sys, tempfile, unittest
+import glob, io, os, shutil, subprocess, sys, tempfile, unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pack_image as pi
@@ -158,11 +158,23 @@ TOOLCHAIN = next((os.path.join(FW, ".toolchain", d, "bin") for d in
                   (os.listdir(os.path.join(FW, ".toolchain")) if os.path.isdir(os.path.join(FW, ".toolchain")) else [])), None)
 
 
-@unittest.skipUnless(TOOLCHAIN and os.path.exists(os.path.join(FW, "out", "app.axf")), "needs a built out/app.axf")
+def built_out():
+    """PACK_TEST_OUT, else the newest out*/ or out*/<unit>/ dir holding app.axf and bootloader.axf."""
+    if os.environ.get("PACK_TEST_OUT"):
+        return os.environ["PACK_TEST_OUT"]
+    dirs = [d for d in glob.glob(os.path.join(FW, "out*")) + glob.glob(os.path.join(FW, "out*", "*"))
+            if all(os.path.isfile(os.path.join(d, f)) for f in ("app.axf", "bootloader.axf"))]
+    return max(dirs, key=lambda d: os.path.getmtime(os.path.join(d, "app.axf")), default=None)
+
+
+OUT = built_out()
+
+
+@unittest.skipUnless(TOOLCHAIN and OUT, "needs a build (app.axf + bootloader.axf under out*/; or PACK_TEST_OUT)")
 class EndToEnd(unittest.TestCase):
     def run_pack(self, tmp, layout_text=None):
         for f in ("app.axf", "bootloader.axf"):
-            shutil.copy(os.path.join(FW, "out", f), tmp)
+            shutil.copy(os.path.join(OUT, f), tmp)
         cmd = [sys.executable, os.path.join(FW, "tools", "pack_image.py"),
                os.path.join(tmp, "app.axf"), os.path.join(tmp, "bootloader.axf"), TOOLCHAIN]
         if layout_text:
