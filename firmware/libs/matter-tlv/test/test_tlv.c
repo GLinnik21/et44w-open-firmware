@@ -466,8 +466,10 @@ static void test_helpers(void)
 {
     mt_tlv_rd r;
     mt_span b;
-    /* { 1: bytes "abc" } */
-    EQ_ERR(mt_tlv_open_struct(&r, mt_span_of(BYTES(0x15, 0x30, 0x01, 0x03, 'a', 'b', 'c', 0x18), 8)), MT_OK);
+    /* Named arrays, not BYTES(): the reader keeps pointing into them after EQ_ERR's block ends. */
+    static const uint8_t abc[] = {0x15, 0x30, 0x01, 0x03, 'a', 'b', 'c', 0x18}; /* { 1: bytes "abc" } */
+    static const uint8_t uint7[] = {0x15, 0x24, 0x01, 0x07, 0x18};
+    EQ_ERR(mt_tlv_open_struct(&r, mt_span_of(abc, sizeof abc)), MT_OK);
     EQ_ERR(mt_tlv_next(&r), MT_OK);
     EQ_ERR(mt_tlv_get_bytes_len(&r, 3, 3, &b), MT_OK);
     CHECK(b.len == 3 && b.p[0] == 'a');
@@ -475,7 +477,7 @@ static void test_helpers(void)
     EQ_ERR(mt_tlv_get_bytes_len(&r, 4, 9, &b), MT_ERR_INVALID);
     EQ_ERR(mt_tlv_next(&r), MT_ERR_NOT_FOUND);
     /* a uint is not a byte string */
-    EQ_ERR(mt_tlv_open_struct(&r, mt_span_of(BYTES(0x15, 0x24, 0x01, 0x07, 0x18), 5)), MT_OK);
+    EQ_ERR(mt_tlv_open_struct(&r, mt_span_of(uint7, sizeof uint7)), MT_OK);
     EQ_ERR(mt_tlv_next(&r), MT_OK);
     EQ_ERR(mt_tlv_get_bytes_len(&r, 0, 9, &b), MT_ERR_INVALID);
     /* empty input, an array, a context-tagged struct */
