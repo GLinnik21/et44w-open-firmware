@@ -1,0 +1,72 @@
+# Builds the firmware for the example unit on Linux (x86_64 and arm64) and runs every host test, the way
+# the README describes it: dummy development network, throwaway OTA key, fresh Matter setup data.
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: firmware
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache SDK, Monocypher and toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            firmware/vendor
+            firmware/.toolchain
+          key: vendor-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('firmware/vendor.lock', 'firmware/tools/get-toolchain.sh') }}
+
+      - name: Fetch sources and toolchain
+        run: |
+          tools/get-vendor.sh
+          tools/get-toolchain.sh
+
+      - name: Python environment
+        run: |
+          python -m venv ../.venv-flash
+          ../.venv-flash/bin/pip install -q ltchiptool typer construct pycryptodomex pyserial cryptography
+
+      - name: Per-device files (dummy network, throwaway key, new setup data)
+        run: |
+          A=apps/thermostat-matter
+          printf '#define WIFI_SSID     "ci-network"\n#define WIFI_PASSWORD "ci-password"\n' > $A/wifi_credentials.h
+          ../.venv-flash/bin/python tools/ota_keygen.py ../secrets/ota_signing.key $A/ota_pubkey.h
+          make UNIT=example SERIAL=000000000001 SETUP_TXT=../secrets/example_matter_setup.txt matter-unit
+
+      - name: Build
+        run: make -j"$(nproc)" UNIT=example OUT=out-matter/example
+
+      - name: Size
+        run: |
+          ls -l out-matter/example/*.bin
+          ../.venv-flash/bin/python tools/size_report.py out-matter/example/app.map | tail -3
+
+      - name: C library tests
+        run: for t in libs/*/test; do make -C "$t" || exit 1; done
+
+      - name: Matter host loopback test
+        run: make -C tools/matter-host test
+
+      - name: Python tests
+        run: |
+          PACK_TEST_OUT=out-matter/example ../.venv-flash/bin/python -m unittest tools/test_pack_image.py tools/test_matter_setup.py
+          ../.venv-flash/bin/python tools/ota_push.py --self-test
