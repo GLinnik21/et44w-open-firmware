@@ -7,7 +7,7 @@ OTA slot.
 Flash-resident output sections are classified as code (.xip.code_c, .ram.code_text), rodata
 (.xip.code_p, .ram.code_rodata) and data (.data and friends). An input section is credited to the
 lib that owns its object: libs/<name> -> <name>, apps and private apps -> app, platform/ -> platform,
-vendor/ by component (mbedtls, lwip, adk, sdk), prebuilt archives -> lib<name>.a. With --base, the
+vendor/ by component (mbedtls, lwip, Monocypher -> ed25519, sdk), prebuilt archives -> lib<name>.a. With --base, the
 columns show the change against the other map. The image size is read from the packed
 part_firmware_is.data.* next to the map, when present.
 """
@@ -42,6 +42,8 @@ def owner(path):
         return "mbedtls"
     if "lwip" in p:
         return "lwip"
+    if "Monocypher" in p:
+        return "ed25519"
     if p.startswith("vendor/"):
         return "sdk"
     return "other"

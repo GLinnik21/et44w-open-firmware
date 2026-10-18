@@ -1,6 +1,6 @@
 /* Sanity check of the configured OTA public key. Pure C (host-tested in libs/ota/test).
- * The ADK's Ed25519 verifier rejects neither small-order keys nor S >= L, so under a small-order key (the
- * all-zero placeholder is one: y = 0, order 4) a forged signature verifies about one try in four. */
+ * A verifier that doesn't reject small-order keys lets forged signatures through under such a key (the
+ * all-zero placeholder is one: y = 0, order 4), so refuse it regardless of the verifier. */
 #pragma once
 
 #include <stdbool.h>

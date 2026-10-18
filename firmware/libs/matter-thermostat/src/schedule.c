@@ -14,7 +14,7 @@ static const mt_dm_cmd_def cmds[] = { { MT_ONOFF_CMD_OFF, MT_IM_PRIV_OPERATE, fa
                                       { MT_ONOFF_CMD_ON, MT_IM_PRIV_OPERATE, false },
                                       { MT_ONOFF_CMD_TOGGLE, MT_IM_PRIV_OPERATE, false } };
 
-static bool running(const mt_thermostat *t) { return thermo_target_state(t->cfg.model) == THERMO_HK_AUTO; }
+static bool running(const mt_thermostat *t) { return thermo_target_state(t->cfg.model) == THERMO_MODE_AUTO; }
 
 static mt_err onoff_read(const mt_dm_at *at, const mt_im_rctx *rc, uint32_t attr, uint16_t item, mt_tlv_wr *w,
                          mt_tlv_tag tag)
@@ -44,7 +44,7 @@ static mt_im_status onoff_invoke(const mt_dm_at *at, const mt_im_subject *s, uin
     default: return MT_IM_UNSUPPORTED_COMMAND;
     }
     if (want == running(t)) return MT_IM_SUCCESS;
-    if (!thermo_set_target_state(t->cfg.model, want ? THERMO_HK_AUTO : THERMO_HK_HEAT, ts_now(t)))
+    if (!thermo_set_target_state(t->cfg.model, want ? THERMO_MODE_AUTO : THERMO_MODE_HEAT, ts_now(t)))
         return MT_IM_FAILURE;
     /* The pending model value changed: endpoint 1's SystemMode may too. sync reports both. */
     if (t->cfg.on_write) t->cfg.on_write(t->cfg.ctx);

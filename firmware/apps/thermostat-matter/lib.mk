@@ -1,17 +1,14 @@
 # ET-44W floor thermostat as a Matter 1.3 device (on-network commissioning, BLE for the
 # first 15 min while uncommissioned).
-#   make MATTER=1 APP=apps/thermostat-matter UNIT=<unit>      (from firmware/; `make clean` when
-#   switching UNIT, make doesn't track it)
+#   make UNIT=<unit> OUT=out-matter/<unit>      (from firmware/; APP defaults to this app; make doesn't
+#   track UNIT, so one OUT per unit)
 # Per unit (git-ignored): units/<UNIT>/matter_unit.h = Matter setup (verifier, discriminator, serial; no passcode).
 # Create it once, never regenerate it for a commissioned unit (the QR code changes):
-#   make MATTER=1 APP=apps/thermostat-matter UNIT=<unit> SERIAL=<serial> SETUP_TXT=<file> matter-unit
+#   make UNIT=<unit> SERIAL=<serial> SETUP_TXT=<file> matter-unit
 # SETUP_TXT receives the passcode, QR payload and manual code (keep it outside the repo, e.g. secrets/).
-# Per unit, tracked: units/<UNIT>/unit.h (THERMOSTAT_NAME, THERMOSTAT_SERIAL). Also needs wifi_credentials.h and
+# Per unit, tracked: units/<UNIT>/unit.h (THERMOSTAT_NAME). Also needs wifi_credentials.h and
 # ota_pubkey.h (see the .example files; ota_pubkey.h must hold the real key or the image can never be updated over
 # the air).
-ifneq ($(MATTER),1)
-$(error apps/thermostat-matter needs MATTER=1)
-endif
 UNIT ?= example
 TM_UNIT_H  := $(d)/units/$(UNIT)/matter_unit.h
 

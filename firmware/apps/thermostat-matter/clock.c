@@ -17,7 +17,7 @@ static volatile bool started;
 static void StartOnTcpip(void* arg) {
     (void) arg;
     ip_addr_t fallback;
-    if (ipaddr_aton(THERMOSTAT_DNS_FALLBACK, &fallback)) {
+    if (ipaddr_aton(TM_DNS_FALLBACK, &fallback)) {
         dns_setserver(1, &fallback);
     }
     sntp_init();
@@ -28,8 +28,8 @@ void clock_start(void) {
         return;
     }
     started = true;
-    if (!tz_parse(THERMOSTAT_TZ, &zone)) {
-        printf("clock: bad TZ \"%s\", using UTC\n", THERMOSTAT_TZ);
+    if (!tz_parse(TM_TZ, &zone)) {
+        printf("clock: bad TZ \"%s\", using UTC\n", TM_TZ);
     }
     // lwIP raw API (udp_new, dns, sys_timeout) belongs on the TCP/IP thread.
     if (tcpip_callback(StartOnTcpip, NULL) != ERR_OK) {

@@ -701,7 +701,7 @@ static void test_sync(void)
     CHECK(rd_int(TS, MT_TSTAT_OCC_HEAT_SETPOINT) == 2500);
 
     feed(THERMO_DP_MODE, 1);                  /* hold -> schedule: still Heat for Matter */
-    feed(THERMO_DP_LOCK, 1);
+    feed(108, 1);                             /* child lock: not a model DP */
     CHECK(bumped(m, 2));
 
     feed(THERMO_DP_STATE, 1);                 /* relay on */

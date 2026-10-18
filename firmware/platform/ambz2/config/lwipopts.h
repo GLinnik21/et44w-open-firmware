@@ -4,9 +4,9 @@
 
 #include_next "lwipopts.h"
 
-/* Sockets: sized for the removed HomeKit firmware (9 sessions + listener) and kept, plus OTA (1), netlog (2), web
- * page (2: listener + client), mDNS (raw UDP pcb) and room for SNTP/provisioning. The web server closes first, so each page poll
- * leaves a TCP PCB in TIME_WAIT (lwIP reuses those first when PCBs run out). */
+/* Sockets: Matter (UDP), OTA (1), netlog (2), web page (2: listener + client), mDNS (raw UDP pcb), SNTP, with
+ * headroom left from the HomeKit firmware (shrink only after measuring heap on a device). The web server closes
+ * first, so each page poll leaves a TCP PCB in TIME_WAIT (lwIP reuses those first when PCBs run out). */
 #undef  MEMP_NUM_NETCONN
 #define MEMP_NUM_NETCONN        18
 #undef  MEMP_NUM_TCP_PCB
@@ -25,14 +25,20 @@
 #define LWIP_IPV6_AUTOCONFIG    1
 #define LWIP_ICMP6              1
 
-/* Source mDNS responder (src/apps/mdns), replaces the prebuilt lib_mdns. */
+/* Source mDNS responder (src/apps/mdns), replaces the prebuilt lib_mdns. It holds one service by default; the Matter
+ * node advertises up to MT_NODE_MDNS_MAX (commissionable + 3 fabrics + a pending one; checked in matter-port mdns.c). */
 #define LWIP_MDNS_RESPONDER     1
+#define MDNS_MAX_SERVICES       5
 #undef  LWIP_NUM_NETIF_CLIENT_DATA
 #define LWIP_NUM_NETIF_CLIENT_DATA 1
 #undef  LWIP_IGMP
 #define LWIP_IGMP               1
 #undef  MEMP_NUM_SYS_TIMEOUT
 #define MEMP_NUM_SYS_TIMEOUT    24
+
+/* Loopback: the app's OTA self-check connects to its own OTA listener on 127.0.0.1 (thermostat-matter health.c). */
+#define LWIP_NETIF_LOOPBACK     1
+#define LWIP_HAVE_LOOPIF        1
 
 /* IPv6 next hop for ULA destinations despite a lifetime-0 RA (src/lwip_ula_route.c). */
 #define LWIP_HOOK_FILENAME      "lwip_hooks.h"

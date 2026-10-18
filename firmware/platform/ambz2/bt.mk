@@ -1,4 +1,4 @@
-# Realtek BLE host stack (closed btgap.a + board glue), only with `make BT=1`. Vendor code, warnings off.
+# Realtek BLE host stack (closed btgap.a + board glue) for Matter commissioning. Vendor code, warnings off.
 BTSDK := $(SDK)/component/common/bluetooth/realtek/sdk
 LIBS += bt
 bt_DEPS   := sdk
@@ -14,5 +14,3 @@ bt_SRC := $(addprefix $(BTSDK)/board/amebaz2/src/,hci/bt_fwconfig.c hci/bt_norma
           $(BTSDK)/board/common/os/freertos/osif_freertos.c \
           $(SDK)/component/common/file_system/ftl/ftl.c
 LDLIBS += $(BTSDK)/board/amebaz2/lib/GCC/btgap.a
-# The probe's health check connects to its own OTA listener on 127.0.0.1 (global: lwIP is built by the sdk lib).
-CFLAGS += -DLWIP_NETIF_LOOPBACK=1 -DLWIP_HAVE_LOOPIF=1

@@ -24,11 +24,7 @@
 #include "wdog.h"
 #include "web.h"              // settings page on port 80
 
-#if __has_include("matter_unit.h")
-#include "matter_unit.h"
-#else
-#error "Missing units/<UNIT>/matter_unit.h: see lib.mk (make ... matter-unit)"
-#endif
+#include "matter_unit.h"   // units/<UNIT>, generated (lib.mk checks it exists)
 #if __has_include("wifi_credentials.h")
 #include "wifi_credentials.h"
 #else

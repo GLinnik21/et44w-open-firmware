@@ -1,5 +1,5 @@
 // Shape of units/<UNIT>/matter_unit.h (git-ignored). Never write it by hand: generate it with
-//   make MATTER=1 APP=apps/thermostat-matter UNIT=<unit> SERIAL=<serial> SETUP_TXT=<file> matter-unit
+//   make UNIT=<unit> SERIAL=<serial> SETUP_TXT=<file> matter-unit   (from firmware/)
 // which runs tools/matter_setup.py --unit and writes the passcode / QR / manual code ONLY to SETUP_TXT (keep that
 // file outside the repo, e.g. secrets/<unit>_matter_setup.txt). The device gets the verifier, never the passcode.
 #ifndef MATTER_UNIT_H

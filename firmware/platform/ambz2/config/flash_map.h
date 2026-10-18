@@ -7,6 +7,3 @@
 #include "../partitions.def"
 #undef FLASH_TOTAL
 #undef FLASH_PART
-
-/* DCT modules that fit in kv: each takes 4 KiB, doubled for its backup copy. */
-#define FLASH_KV_DCT_MODULES (FLASH_kv_SIZE / (2 * 0x1000))

@@ -1,5 +1,5 @@
-/* Thermostat model between the TuyaMCU DPs of the ET-44W and the controller (Apple Home over Matter; the values
- * follow the HomeKit thermostat model). Pure: no I/O, no clock; the caller passes now_ms (monotonic, may wrap).
+/* Thermostat model between the TuyaMCU DPs of the ET-44W and the controller (Apple Home over Matter).
+ * Pure: no I/O, no clock; the caller passes now_ms (monotonic, may wrap).
  * Not thread-safe; drive it from one task.
  *
  * Reports from the MCU go in with thermo_report(); controller writes go in with thermo_set_*(), which
@@ -21,12 +21,11 @@ enum {
     THERMO_DP_STATE = 3,
     THERMO_DP_SETPOINT = 16,
     THERMO_DP_CURRENT = 24,
-    THERMO_DP_FAULT = 104,
-    THERMO_DP_LOCK = 108
+    THERMO_DP_FAULT = 104
 };
 
-/* Target/CurrentHeatingCoolingState values (HomeKit numbering; matter-thermostat maps them to SystemMode). */
-enum { THERMO_HK_OFF = 0, THERMO_HK_HEAT = 1, THERMO_HK_AUTO = 3 };
+/* Target and current modes; matter-thermostat maps them to SystemMode / ThermostatRunningState. */
+enum { THERMO_MODE_OFF = 0, THERMO_MODE_HEAT = 1, THERMO_MODE_AUTO = 3 };
 
 #define THERMO_RAW_UNKNOWN 0xFFu  /* raw DP value not mapped yet */
 #define THERMO_SET_MIN 50         /* tenths of a degree C */
@@ -61,7 +60,7 @@ typedef struct {
 } thermo_slot;
 
 enum { THERMO_S_SWITCH, THERMO_S_MODE, THERMO_S_STATE, THERMO_S_SETPOINT, THERMO_S_CURRENT,
-       THERMO_S_FAULT, THERMO_S_LOCK, THERMO_S_COUNT };
+       THERMO_S_FAULT, THERMO_S_COUNT };
 
 typedef struct {
     thermo_cfg cfg;
@@ -87,14 +86,12 @@ uint8_t thermo_target_state(const thermo *t);
 uint8_t thermo_current_state(const thermo *t);
 int32_t thermo_target_tenths(const thermo *t);
 int32_t thermo_current_tenths(const thermo *t);
-bool thermo_locked(const thermo *t);
 bool thermo_fault(const thermo *t);
 bool thermo_auto_supported(const thermo *t);
 
 /* Controller writes. Return false if the value isn't supported (nothing is changed). */
-bool thermo_set_target_state(thermo *t, uint8_t hk, uint32_t now_ms);
+bool thermo_set_target_state(thermo *t, uint8_t mode, uint32_t now_ms);
 bool thermo_set_target_c(thermo *t, float celsius, uint32_t now_ms); /* clamped, rounded to 0.5 */
-bool thermo_set_locked(thermo *t, bool on, uint32_t now_ms);
 
 /* DP writes not handed out yet, switch first. Returns the count (<= max) and clears them; the
  * pending hold restarts at now_ms so it covers the MCU's round trip. */

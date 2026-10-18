@@ -5,9 +5,7 @@
 # attestation hooks implemented by matter-node). Pure C11 on top of matter-dm and matter-fabric; persistence
 # goes through the injected mt_kv_ops (mt_core.h).
 # Host test: make -C libs/matter-root/test
-ifeq ($(MATTER),1)
 LIBS += matter_root
 matter_root_INC  := $(d)/include
 matter_root_SRC  := $(wildcard $(d)/src/*.c)
 matter_root_DEPS := matter_core matter_tlv matter_im matter_dm matter_fabric matter_cert matter_crypto mbedtls
-endif

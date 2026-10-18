@@ -59,10 +59,6 @@ class LayoutFile(unittest.TestCase):
             self.assertLessEqual(p.offset + p.size, reserved.offset, name)
         self.assertEqual(pi.region(self.layout, "sdk_backup").offset, 0x3000)
 
-    def test_kv_holds_dct_modules(self):
-        # 9 modules needed (6 HAP + wifi, ota, app); with backup that is 2 x 4 KiB each
-        self.assertGreaterEqual(pi.region(self.layout, "kv").size, 9 * 2 * 0x1000)
-
     def test_factory_is_one_sector(self):
         self.assertEqual(pi.region(self.layout, "factory").size, 0x1000)
 

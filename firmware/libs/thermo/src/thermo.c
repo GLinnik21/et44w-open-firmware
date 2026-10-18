@@ -6,13 +6,11 @@ static const uint8_t kDp[THERMO_S_COUNT] = {
     [THERMO_S_SWITCH] = THERMO_DP_SWITCH,     [THERMO_S_MODE] = THERMO_DP_MODE,
     [THERMO_S_STATE] = THERMO_DP_STATE,       [THERMO_S_SETPOINT] = THERMO_DP_SETPOINT,
     [THERMO_S_CURRENT] = THERMO_DP_CURRENT,   [THERMO_S_FAULT] = THERMO_DP_FAULT,
-    [THERMO_S_LOCK] = THERMO_DP_LOCK,
 };
 static const uint8_t kType[THERMO_S_COUNT] = {
     [THERMO_S_SWITCH] = THERMO_W_BOOL,
     [THERMO_S_MODE] = THERMO_W_ENUM,
     [THERMO_S_SETPOINT] = THERMO_W_VALUE,
-    [THERMO_S_LOCK] = THERMO_W_BOOL,
 };
 
 static int32_t View(const thermo_slot *s) { return s->pending ? s->want : s->value; }
@@ -22,20 +20,20 @@ static int32_t V(const thermo *t, int i) { return View(&t->s[i]); }
 typedef struct {
     uint8_t target, current;
     int32_t set, cur;
-    bool lock, fault;
+    bool fault;
 } Snapshot;
 
 static Snapshot Snap(const thermo *t)
 {
     Snapshot s = {thermo_target_state(t), thermo_current_state(t), thermo_target_tenths(t),
-                  thermo_current_tenths(t), thermo_locked(t), thermo_fault(t)};
+                  thermo_current_tenths(t), thermo_fault(t)};
     return s;
 }
 
 static bool Same(const Snapshot *a, const Snapshot *b)
 {
     return a->target == b->target && a->current == b->current && a->set == b->set &&
-           a->cur == b->cur && a->lock == b->lock && a->fault == b->fault;
+           a->cur == b->cur && a->fault == b->fault;
 }
 
 void thermo_init(thermo *t, const thermo_cfg *cfg)
@@ -90,24 +88,24 @@ bool thermo_ready(const thermo *t)
 
 uint8_t thermo_target_state(const thermo *t)
 {
-    if (!V(t, THERMO_S_SWITCH)) return THERMO_HK_OFF;
+    if (!V(t, THERMO_S_SWITCH)) return THERMO_MODE_OFF;
     int32_t mode = V(t, THERMO_S_MODE);
     if (thermo_auto_supported(t) &&
         (mode == t->cfg.mode_smart ||
          (t->cfg.mode_holiday != THERMO_RAW_UNKNOWN && mode == t->cfg.mode_holiday)))
-        return THERMO_HK_AUTO;
-    return THERMO_HK_HEAT;
+        return THERMO_MODE_AUTO;
+    return THERMO_MODE_HEAT;
 }
 
 uint8_t thermo_current_state(const thermo *t)
 {
-    if (!t->s[THERMO_S_SWITCH].value) return THERMO_HK_OFF; /* reported state, not pending */
+    if (!t->s[THERMO_S_SWITCH].value) return THERMO_MODE_OFF; /* reported state, not pending */
     if (t->cfg.state_heating != THERMO_RAW_UNKNOWN)
         return t->s[THERMO_S_STATE].known && t->s[THERMO_S_STATE].value == t->cfg.state_heating
-                   ? THERMO_HK_HEAT
-                   : THERMO_HK_OFF;
-    return t->s[THERMO_S_CURRENT].value < t->s[THERMO_S_SETPOINT].value ? THERMO_HK_HEAT
-                                                                        : THERMO_HK_OFF;
+                   ? THERMO_MODE_HEAT
+                   : THERMO_MODE_OFF;
+    return t->s[THERMO_S_CURRENT].value < t->s[THERMO_S_SETPOINT].value ? THERMO_MODE_HEAT
+                                                                        : THERMO_MODE_OFF;
 }
 
 int32_t thermo_target_tenths(const thermo *t)
@@ -117,7 +115,6 @@ int32_t thermo_target_tenths(const thermo *t)
 }
 
 int32_t thermo_current_tenths(const thermo *t) { return t->s[THERMO_S_CURRENT].value; }
-bool thermo_locked(const thermo *t) { return V(t, THERMO_S_LOCK) != 0; }
 bool thermo_fault(const thermo *t) { return t->s[THERMO_S_FAULT].value != 0; }
 
 bool thermo_auto_supported(const thermo *t)
@@ -136,21 +133,21 @@ static void Want(thermo *t, int i, int32_t v, uint32_t now_ms)
     s->dirty = !s->known || s->value != v || s->sent || s->dirty;
 }
 
-bool thermo_set_target_state(thermo *t, uint8_t hk, uint32_t now_ms)
+bool thermo_set_target_state(thermo *t, uint8_t mode, uint32_t now_ms)
 {
-    switch (hk) {
-    case THERMO_HK_OFF:
+    switch (mode) {
+    case THERMO_MODE_OFF:
         Want(t, THERMO_S_SWITCH, 0, now_ms);
         return true;
-    case THERMO_HK_HEAT:
+    case THERMO_MODE_HEAT:
         Want(t, THERMO_S_SWITCH, 1, now_ms);
-        if (t->cfg.mode_hold != THERMO_RAW_UNKNOWN && thermo_target_state(t) != THERMO_HK_HEAT)
+        if (t->cfg.mode_hold != THERMO_RAW_UNKNOWN && thermo_target_state(t) != THERMO_MODE_HEAT)
             Want(t, THERMO_S_MODE, t->cfg.mode_hold, now_ms);
         return true;
-    case THERMO_HK_AUTO:
+    case THERMO_MODE_AUTO:
         if (!thermo_auto_supported(t)) return false;
         Want(t, THERMO_S_SWITCH, 1, now_ms);
-        if (thermo_target_state(t) != THERMO_HK_AUTO) /* keep holiday as it is */
+        if (thermo_target_state(t) != THERMO_MODE_AUTO) /* keep holiday as it is */
             Want(t, THERMO_S_MODE, t->cfg.mode_smart, now_ms);
         return true;
     default:
@@ -170,12 +167,6 @@ bool thermo_set_target_c(thermo *t, float celsius, uint32_t now_ms)
     return true;
 }
 
-bool thermo_set_locked(thermo *t, bool on, uint32_t now_ms)
-{
-    Want(t, THERMO_S_LOCK, on ? 1 : 0, now_ms);
-    return true;
-}
-
 bool thermo_has_writes(const thermo *t)
 {
     for (int i = 0; i < THERMO_S_COUNT; i++)
@@ -185,7 +176,7 @@ bool thermo_has_writes(const thermo *t)
 
 size_t thermo_take_writes(thermo *t, thermo_write *out, size_t max, uint32_t now_ms)
 {
-    static const uint8_t order[] = {THERMO_S_SWITCH, THERMO_S_MODE, THERMO_S_SETPOINT, THERMO_S_LOCK};
+    static const uint8_t order[] = {THERMO_S_SWITCH, THERMO_S_MODE, THERMO_S_SETPOINT};
     size_t n = 0;
     for (size_t k = 0; k < sizeof order && n < max; k++) {
         thermo_slot *s = &t->s[order[k]];

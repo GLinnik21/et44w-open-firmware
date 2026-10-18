@@ -16,10 +16,6 @@ ifeq ($(filter-out clean,$(MAKECMDGOALS))$(if $(MAKECMDGOALS),,all),)
 else ifeq ($(wildcard $(TC)/arm-none-eabi-gcc),)
 $(error no arm-none-eabi-gcc in TC='$(TC)': tools/get-toolchain.sh failed (see its output above) or TC is wrong)
 endif
-# Every build is a Matter build (the HomeKit firmware was removed). MATTER stays a variable because the libs'
-# lib.mk files switch on it; it implies BT=1.
-override MATTER := 1
-override BT := 1
 OUT      ?= out-matter
 
 CROSS    := $(TC)/arm-none-eabi-

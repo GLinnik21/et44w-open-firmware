@@ -1,5 +1,5 @@
 // Product constants of the Matter ET-44W image. Per-unit data: units/<UNIT>/matter_unit.h (Matter setup) and
-// units/<UNIT>/unit.h (THERMOSTAT_NAME, THERMOSTAT_SERIAL).
+// units/<UNIT>/unit.h (THERMOSTAT_NAME).
 #ifndef MATTER_CONFIG_H
 #define MATTER_CONFIG_H
 
@@ -13,11 +13,11 @@
 
 // Local time zone (POSIX TZ) for the MCU's weekly schedule (clock.c). Set your own, e.g.
 // "CET-1CEST,M3.5.0,M10.5.0/3" (Central Europe), "EST5EDT,M3.2.0,M11.1.0" (US Eastern), "<+04>-4" (UTC+4, no DST).
-#define THERMOSTAT_TZ "UTC0"
+#define TM_TZ "UTC0"
 
 // Second DNS server, tried when the router's (from DHCP) doesn't answer, e.g. because an IoT VLAN
 // firewall also blocks the router's own DNS.
-#define THERMOSTAT_DNS_FALLBACK "1.1.1.1"
+#define TM_DNS_FALLBACK "1.1.1.1"
 
 // Raw DP values of the ET-44W, from the Tuya thing model's enum order (mode: holiday, smart, hold; work_state:
 // warming, heating), matching what the MCU reports.

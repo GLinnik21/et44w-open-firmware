@@ -19,7 +19,6 @@ static void Boot(thermo *t, const thermo_cfg *cfg)
     thermo_report(t, 16, 300, 0);
     thermo_report(t, 24, 268, 0);
     thermo_report(t, 104, 0, 0);
-    thermo_report(t, 108, 0, 0);
     CHECK(thermo_ready(t));
 }
 
@@ -27,23 +26,22 @@ static void test_view(void)
 {
     thermo t;
     Boot(&t, &kCfg);
-    CHECK(thermo_dp_used(THERMO_DP_SETPOINT) && thermo_dp_used(THERMO_DP_LOCK) && thermo_dp_used(THERMO_DP_FAULT));
-    CHECK(!thermo_dp_used(17) && !thermo_dp_used(119) && !thermo_dp_used(0));
-    CHECK_EQ(thermo_target_state(&t), THERMO_HK_AUTO);
-    CHECK_EQ(thermo_current_state(&t), THERMO_HK_OFF); /* DP3 1 != heating 0 */
+    CHECK(thermo_dp_used(THERMO_DP_SETPOINT) && thermo_dp_used(THERMO_DP_FAULT));
+    CHECK(!thermo_dp_used(108) && !thermo_dp_used(17) && !thermo_dp_used(119) && !thermo_dp_used(0));
+    CHECK_EQ(thermo_target_state(&t), THERMO_MODE_AUTO);
+    CHECK_EQ(thermo_current_state(&t), THERMO_MODE_OFF); /* DP3 1 != heating 0 */
     CHECK_EQ(thermo_target_tenths(&t), 300);
     CHECK_EQ(thermo_current_tenths(&t), 268);
-    CHECK(!thermo_locked(&t));
     CHECK(!thermo_fault(&t));
     CHECK(thermo_report(&t, 3, 0, 10));
-    CHECK_EQ(thermo_current_state(&t), THERMO_HK_HEAT);
+    CHECK_EQ(thermo_current_state(&t), THERMO_MODE_HEAT);
     CHECK(thermo_report(&t, 2, 0, 10));
-    CHECK_EQ(thermo_target_state(&t), THERMO_HK_HEAT);
+    CHECK_EQ(thermo_target_state(&t), THERMO_MODE_HEAT);
     CHECK(thermo_report(&t, 2, 2, 10)); /* holiday shows as Auto */
-    CHECK_EQ(thermo_target_state(&t), THERMO_HK_AUTO);
+    CHECK_EQ(thermo_target_state(&t), THERMO_MODE_AUTO);
     CHECK(thermo_report(&t, 1, 0, 10));
-    CHECK_EQ(thermo_target_state(&t), THERMO_HK_OFF);
-    CHECK_EQ(thermo_current_state(&t), THERMO_HK_OFF);
+    CHECK_EQ(thermo_target_state(&t), THERMO_MODE_OFF);
+    CHECK_EQ(thermo_current_state(&t), THERMO_MODE_OFF);
     CHECK(thermo_report(&t, 104, 2, 10));
     CHECK(thermo_fault(&t));
     CHECK(!thermo_report(&t, 24, 268, 10)); /* no change */
@@ -108,17 +106,17 @@ static void test_rewrite_in_flight(void)
 
     /* Switch: Off then Heat within one round trip. */
     thermo_report(&t, 2, 0, 2000); /* hold, so Heat doesn't touch the mode */
-    thermo_set_target_state(&t, THERMO_HK_OFF, 2000);
+    thermo_set_target_state(&t, THERMO_MODE_OFF, 2000);
     CHECK_EQ(thermo_take_writes(&t, w, THERMO_MAX_WRITES, 2500), 1);
-    thermo_set_target_state(&t, THERMO_HK_HEAT, 2600);
+    thermo_set_target_state(&t, THERMO_MODE_HEAT, 2600);
     CHECK_EQ(thermo_take_writes(&t, w, THERMO_MAX_WRITES, 3100), 1);
     CHECK_EQ(w[0].dp, 1);
     CHECK_EQ(w[0].value, 1);
 
     /* Nothing in flight: toggling back still sends nothing. */
     thermo_report(&t, 1, 1, 3200);
-    thermo_set_locked(&t, true, 4000);
-    thermo_set_locked(&t, false, 4100);
+    thermo_set_target_c(&t, 25.0f, 4000);
+    thermo_set_target_c(&t, 30.0f, 4100);
     CHECK_EQ(thermo_take_writes(&t, w, THERMO_MAX_WRITES, 4600), 0);
 }
 
@@ -154,23 +152,23 @@ static void test_modes(void)
     thermo t;
     thermo_write w[THERMO_MAX_WRITES];
     Boot(&t, &kCfg); /* on, smart */
-    CHECK(thermo_set_target_state(&t, THERMO_HK_HEAT, 0));
-    CHECK_EQ(thermo_target_state(&t), THERMO_HK_HEAT);
+    CHECK(thermo_set_target_state(&t, THERMO_MODE_HEAT, 0));
+    CHECK_EQ(thermo_target_state(&t), THERMO_MODE_HEAT);
     CHECK_EQ(thermo_take_writes(&t, w, THERMO_MAX_WRITES, 0), 1);
     CHECK_EQ(w[0].dp, 2);
     CHECK_EQ(w[0].type, THERMO_W_ENUM);
     CHECK_EQ(w[0].value, 0);
     thermo_report(&t, 2, 0, 10);
 
-    CHECK(thermo_set_target_state(&t, THERMO_HK_OFF, 20));
-    CHECK_EQ(thermo_target_state(&t), THERMO_HK_OFF);
+    CHECK(thermo_set_target_state(&t, THERMO_MODE_OFF, 20));
+    CHECK_EQ(thermo_target_state(&t), THERMO_MODE_OFF);
     CHECK_EQ(thermo_take_writes(&t, w, THERMO_MAX_WRITES, 20), 1);
     CHECK_EQ(w[0].dp, 1);
     CHECK_EQ(w[0].type, THERMO_W_BOOL);
     CHECK_EQ(w[0].value, 0);
     thermo_report(&t, 1, 0, 30);
 
-    CHECK(thermo_set_target_state(&t, THERMO_HK_AUTO, 40)); /* off+hold -> on+smart, switch first */
+    CHECK(thermo_set_target_state(&t, THERMO_MODE_AUTO, 40)); /* off+hold -> on+smart, switch first */
     CHECK_EQ(thermo_take_writes(&t, w, THERMO_MAX_WRITES, 40), 2);
     CHECK_EQ(w[0].dp, 1);
     CHECK_EQ(w[0].value, 1);
@@ -182,7 +180,7 @@ static void test_modes(void)
     thermo_report(&t, 1, 1, 60);
     thermo_report(&t, 2, 2, 60); /* holiday: Auto stays, no write */
     thermo_tick(&t, 100000);
-    CHECK(thermo_set_target_state(&t, THERMO_HK_AUTO, 100000));
+    CHECK(thermo_set_target_state(&t, THERMO_MODE_AUTO, 100000));
     CHECK(!thermo_has_writes(&t));
 }
 
@@ -192,27 +190,13 @@ static void test_unknown_modes(void)
     thermo_write w[THERMO_MAX_WRITES];
     Boot(&t, &kUnknown);
     CHECK(!thermo_auto_supported(&t));
-    CHECK_EQ(thermo_target_state(&t), THERMO_HK_HEAT);
-    CHECK(!thermo_set_target_state(&t, THERMO_HK_AUTO, 0));
-    CHECK(thermo_set_target_state(&t, THERMO_HK_HEAT, 0)); /* already on: nothing */
+    CHECK_EQ(thermo_target_state(&t), THERMO_MODE_HEAT);
+    CHECK(!thermo_set_target_state(&t, THERMO_MODE_AUTO, 0));
+    CHECK(thermo_set_target_state(&t, THERMO_MODE_HEAT, 0)); /* already on: nothing */
     CHECK_EQ(thermo_take_writes(&t, w, THERMO_MAX_WRITES, 0), 0);
-    CHECK_EQ(thermo_current_state(&t), THERMO_HK_HEAT); /* guessed: 26.8 < 30.0 */
+    CHECK_EQ(thermo_current_state(&t), THERMO_MODE_HEAT); /* guessed: 26.8 < 30.0 */
     thermo_report(&t, 24, 305, 0);
-    CHECK_EQ(thermo_current_state(&t), THERMO_HK_OFF);
-}
-
-static void test_lock(void)
-{
-    thermo t;
-    thermo_write w[THERMO_MAX_WRITES];
-    Boot(&t, &kCfg);
-    thermo_set_locked(&t, true, 0);
-    CHECK(thermo_locked(&t));
-    CHECK_EQ(thermo_take_writes(&t, w, 1, 0), 1);
-    CHECK_EQ(w[0].dp, 108);
-    CHECK_EQ(w[0].value, 1);
-    thermo_report(&t, 108, 1, 10);
-    CHECK(thermo_locked(&t));
+    CHECK_EQ(thermo_current_state(&t), THERMO_MODE_OFF);
 }
 
 static void test_wrap(void)
@@ -221,7 +205,7 @@ static void test_wrap(void)
     thermo_write w[THERMO_MAX_WRITES];
     Boot(&t, &kCfg);
     uint32_t now = 0xFFFFFF00u;
-    thermo_set_locked(&t, true, now);
+    thermo_set_target_c(&t, 22.0f, now);
     thermo_take_writes(&t, w, THERMO_MAX_WRITES, now);
     CHECK(!thermo_tick(&t, now + 1000)); /* wrapped, still within the window */
     CHECK(thermo_tick(&t, now + THERMO_PENDING_MS));
@@ -262,7 +246,6 @@ int main(void)
     RUN(test_clamp_round);
     RUN(test_modes);
     RUN(test_unknown_modes);
-    RUN(test_lock);
     RUN(test_wrap);
     RUN(test_dp_table);
     printf("%d checks, %d failed\n", t_checks, t_fails);

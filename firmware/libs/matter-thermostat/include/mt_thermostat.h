@@ -76,8 +76,8 @@ typedef struct {
     thermo *model;                  /* owned by the app; fed with thermo_report() from the MCU */
     void *ctx;
     uint32_t (*now_ms)(void *ctx);  /* monotonic, may wrap; NULL = always 0 */
-    /* Matter changed the model: the app drains thermo_take_writes() and sends the DPs (debounced as for
-     * HAP). May be NULL. */
+    /* Matter changed the model: the app drains thermo_take_writes() and sends the DPs (debounced).
+     * May be NULL. */
     void (*on_write)(void *ctx);
     /* Identify started (true) or stopped (false), e.g. to blink the LED. May be NULL. */
     void (*on_identify)(void *ctx, bool active);

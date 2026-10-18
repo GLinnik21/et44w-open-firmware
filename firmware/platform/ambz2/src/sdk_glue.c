@@ -16,10 +16,5 @@ int Erase_Fastconnect_data(void) { return 0; }
 /* wifi_conf.c reads the current mode; the AT console (atcmd_wifi.c, not built) normally owns it. */
 int wifi_mode = 1; /* rtw_mode_t RTW_MODE_STA (wifi_constants.h); this lib doesn't see the SDK headers */
 
-/* sys_download_mode() shuts Bluetooth down; the BT lib provides it when linked (make BT=1). */
-#ifndef PLATFORM_HAS_BT
-void hci_tp_close(void) {}
-#endif
-
 /* ATWO (Realtek OTA over the AT console) is not supported. */
 void cmd_update(int argc, char **argv) { (void)argc; (void)argv; }

@@ -4,7 +4,7 @@
 #     include ../../../build/hosttest.mk
 #     CFLAGS += $(MBEDTLS_HOST_CFLAGS)
 #     <test binary>: ... $(MBEDTLS_HOST_LIB)        # and add $(MBEDTLS_HOST_LIB) to the link line
-# Compiles the same mbedtls sources and Matter config as the firmware (build/hosttest/ shadows only
+# Compiles the same mbedtls sources and config as the firmware (build/hosttest/ shadows only
 # the HAVE_ASM switch) once into out-host/mbedtls/, shared by every lib's tests. Objects are written
 # via a temp name and renamed, so parallel `make -C libs/*/test` runs can't corrupt the cache.
 HT_FW      := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))..)
@@ -15,7 +15,7 @@ HT_CC      ?= cc
 include $(HT_FW)/platform/ambz2/mbedtls_sources.mk
 HT_INC := -I$(HT_FW)/build/hosttest -I$(HT_FW)/platform/ambz2/mbedtls -I$(HT_MBEDTLS)/include
 HT_CFG := -DMBEDTLS_CONFIG_FILE='"mbedtls_host_config.h"'
-HT_OBJ := $(addprefix $(HT_OUT)/,$(MBEDTLS_BASE_SRC:.c=.o) $(MBEDTLS_MATTER_SRC:.c=.o))
+HT_OBJ := $(addprefix $(HT_OUT)/,$(MBEDTLS_SRC:.c=.o))
 HT_CFGS := $(HT_FW)/build/hosttest/mbedtls_host_config.h $(HT_FW)/build/hosttest/quiet_printf.h $(wildcard $(HT_FW)/platform/ambz2/mbedtls/*.h)
 
 MBEDTLS_HOST_LIB    := $(HT_OUT)/libmbedtls_matter.a

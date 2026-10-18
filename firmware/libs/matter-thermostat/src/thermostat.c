@@ -62,11 +62,11 @@ void ts_view(const mt_thermostat *t, mt_thermostat_snap *s)
     s->local_null = !m->s[THERMO_S_CURRENT].known || thermo_fault(m);
     s->local = s->local_null ? 0 : hundredths(thermo_current_tenths(m));
     s->setpoint = hundredths(thermo_target_tenths(m));
-    s->mode = thermo_target_state(m) == THERMO_HK_OFF                       ? MT_TSTAT_MODE_OFF
-            : t->cfg.auto_mode && thermo_target_state(m) == THERMO_HK_AUTO ? MT_TSTAT_MODE_AUTO
+    s->mode = thermo_target_state(m) == THERMO_MODE_OFF                       ? MT_TSTAT_MODE_OFF
+            : t->cfg.auto_mode && thermo_target_state(m) == THERMO_MODE_AUTO ? MT_TSTAT_MODE_AUTO
                                                                             : MT_TSTAT_MODE_HEAT;
-    s->running = thermo_current_state(m) == THERMO_HK_HEAT ? MT_TSTAT_RUNNING_HEAT : 0;
-    s->schedule = thermo_target_state(m) == THERMO_HK_AUTO;
+    s->running = thermo_current_state(m) == THERMO_MODE_HEAT ? MT_TSTAT_RUNNING_HEAT : 0;
+    s->schedule = thermo_target_state(m) == THERMO_MODE_AUTO;
 }
 
 static mt_err thermostat_read(const mt_dm_at *at, const mt_im_rctx *rc, uint32_t attr, uint16_t item,
@@ -126,8 +126,8 @@ static mt_im_status thermostat_write(const mt_dm_at *at, const mt_im_wctx *wc, u
          * hold (thermo). */
         if (v != MT_TSTAT_MODE_OFF && v != MT_TSTAT_MODE_HEAT && !(t->cfg.auto_mode && v == MT_TSTAT_MODE_AUTO))
             return MT_IM_CONSTRAINT_ERROR;
-        if (!thermo_set_target_state(m, v == MT_TSTAT_MODE_OFF ? THERMO_HK_OFF
-                                        : v == MT_TSTAT_MODE_AUTO ? THERMO_HK_AUTO : THERMO_HK_HEAT, ts_now(t)))
+        if (!thermo_set_target_state(m, v == MT_TSTAT_MODE_OFF ? THERMO_MODE_OFF
+                                        : v == MT_TSTAT_MODE_AUTO ? THERMO_MODE_AUTO : THERMO_MODE_HEAT, ts_now(t)))
             return MT_IM_FAILURE;
         t->snap.mode = (uint8_t)v;
         break;

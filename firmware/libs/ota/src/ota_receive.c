@@ -12,7 +12,6 @@
 
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
-#include "mbedtls/sha512.h"
 #include "monocypher-ed25519.h"
 
 #define HEADER_MAGIC "AOT2"
@@ -49,16 +48,15 @@ static const char* RecvAll(int sock, uint8_t* buf, size_t n) {
 /** Writes the image into slot, mark held back, and checks it hashes to digest. Fills mark. */
 static const char* ReceiveImage(int sock, uint32_t slot, uint32_t length, uint32_t serial, const uint8_t digest[64],
                                 uint8_t mark[OTA_MARK_SIZE]) {
-    mbedtls_sha512_context sha;
-    mbedtls_sha512_init(&sha);
-    mbedtls_sha512_starts(&sha, 0);
+    crypto_sha512_ctx sha;
+    crypto_sha512_init(&sha);
     const char* err = NULL;
     for (uint32_t off = 0; off < length; off += OTA_SECTOR) {
         size_t n = length - off < OTA_SECTOR ? length - off : OTA_SECTOR;
         if ((err = RecvAll(sock, chunk, n)) != NULL) {
             break;
         }
-        mbedtls_sha512_update(&sha, chunk, n);
+        crypto_sha512_update(&sha, chunk, n);
         if (off == 0) {
             if (memcmp(chunk + OTA_SERIAL_OFFSET, &serial, sizeof serial) != 0) { // before the first erase
                 err = "image serial differs from the signed one";
@@ -71,8 +69,7 @@ static const char* ReceiveImage(int sock, uint32_t slot, uint32_t length, uint32
         ota_flash_write(slot + off, chunk, n);
     }
     uint8_t received[64];
-    mbedtls_sha512_finish(&sha, received);
-    mbedtls_sha512_free(&sha);
+    crypto_sha512_final(&sha, received);
     if (!err && memcmp(received, digest, sizeof received) != 0) {
         err = "image does not match the signed hash";
     }
@@ -81,19 +78,17 @@ static const char* ReceiveImage(int sock, uint32_t slot, uint32_t length, uint32
 
 /** Hashes the slot as written, with the held-back mark in place. */
 static void HashSlot(uint32_t slot, uint32_t length, const uint8_t mark[OTA_MARK_SIZE], uint8_t digest[64]) {
-    mbedtls_sha512_context sha;
-    mbedtls_sha512_init(&sha);
-    mbedtls_sha512_starts(&sha, 0);
+    crypto_sha512_ctx sha;
+    crypto_sha512_init(&sha);
     for (uint32_t off = 0; off < length; off += OTA_SECTOR) {
         size_t n = length - off < OTA_SECTOR ? length - off : OTA_SECTOR;
         ota_flash_read(slot + off, chunk, n);
         if (off == 0) {
             memcpy(chunk, mark, OTA_MARK_SIZE);
         }
-        mbedtls_sha512_update(&sha, chunk, n);
+        crypto_sha512_update(&sha, chunk, n);
     }
-    mbedtls_sha512_finish(&sha, digest);
-    mbedtls_sha512_free(&sha);
+    crypto_sha512_final(&sha, digest);
 }
 
 static bool SignatureValid(const header_v2* h, const uint8_t key[32]) {

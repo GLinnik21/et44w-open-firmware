@@ -1,4 +1,4 @@
-// Wall-clock time from SNTP, converted to local time with THERMOSTAT_TZ. Thread-safe reads.
+// Wall-clock time from SNTP, converted to local time with TM_TZ (matter_config.h). Thread-safe reads.
 #ifndef CLOCK_H
 #define CLOCK_H
 

@@ -1,14 +1,14 @@
-/* The node's mDNS record set (mt_node_mdns_*) on lwIP 2.0.2's own responder (platform lwip_mdns; this lib raises
- * MDNS_MAX_SERVICES to MTP_MDNS_MAX for it under MATTER=1).
+/* The node's mDNS record set (mt_node_mdns_*) on lwIP 2.0.2's own responder (platform lwip_mdns; MDNS_MAX_SERVICES in
+ * platform/ambz2/config/lwipopts.h).
  *
  * Host name: the 12 upper-case hex digits of the MAC (Matter spec 4.3.4). Services: _matterc._udp (commissionable)
- * and _matter._tcp (one per fabric), port 5540, TTL MTP_MSUB_TTL_S (120 s, like the HAP PAL).
+ * and _matter._tcp (one per fabric), port 5540, TTL MTP_MSUB_TTL_S (120 s).
  *
  * Subtypes (_L<disc>, _S<short>, _V<vid>, _CM, _I<CFID>): lwIP 2.0.2 has none, so mdns_sub.c answers their PTR
  * questions. It sits in front of lwIP's receive callback on the same UDP pcb (found in udp_pcbs after
  * mdns_resp_init), answers, then hands the packet on unchanged; no vendor edit, no second socket on 5353.
  * SRV / TXT / A of the instance are lwIP's. Gap: no service removal, every change rebuilds the whole set
- * (remove_netif + add_netif + add_service), as the HAP PAL does. lwIP sends no goodbyes either, so a rebuild first
+ * (remove_netif + add_netif + add_service). lwIP sends no goodbyes either, so a rebuild first
  * sends TTL-0 PTRs (service + subtypes) for the instances that went away (an old commissioning window otherwise
  * stayed in iOS's list as a second tile).
  *
@@ -32,7 +32,7 @@
 extern struct netif xnetif[];
 
 #define MTP_MDNS_MAX MT_NODE_MDNS_MAX
-_Static_assert(MTP_MDNS_MAX <= 5, "raise MDNS_MAX_SERVICES in lib.mk");
+_Static_assert(MTP_MDNS_MAX <= MDNS_MAX_SERVICES, "raise MDNS_MAX_SERVICES in platform/ambz2/config/lwipopts.h");
 #define TXT_BYTES 192                     /* packed [len][key=value]... per record */
 
 typedef struct {
@@ -203,7 +203,7 @@ static void rebuild(void *arg)
     }
     stop(nif);
     if (!live.n) return;
-    nif->flags |= NETIF_FLAG_IGMP;   /* needed to join the mDNS groups (as in the HAP PAL) */
+    nif->flags |= NETIF_FLAG_IGMP;   /* needed to join the mDNS groups */
 #if LWIP_IPV6
     nif->flags |= NETIF_FLAG_MLD6;
 #endif
