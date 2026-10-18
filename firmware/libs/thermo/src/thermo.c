@@ -18,7 +18,7 @@ static const uint8_t kType[THERMO_S_COUNT] = {
 static int32_t View(const thermo_slot *s) { return s->pending ? s->want : s->value; }
 static int32_t V(const thermo *t, int i) { return View(&t->s[i]); }
 
-/* Everything HomeKit sees, to detect changes. */
+/* Everything a controller sees, to detect changes. */
 typedef struct {
     uint8_t target, current;
     int32_t set, cur;

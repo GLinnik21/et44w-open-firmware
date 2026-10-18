@@ -18,6 +18,7 @@
  * No new upload is accepted while a trial is pending. */
 #pragma once
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #define OTA_PORT        8267
@@ -37,6 +38,11 @@ void ota_boot_check(void);
 /* Starts the upload server task; it also enforces the trial deadline. On a trial boot, rolls back at once if
  * the task can't be created or the key is unusable. */
 void ota_start(const ota_options* options);
+
+/* Known-answer test of the upload signature check (RFC 8032 test 2 accepted, a one-bit-off signature refused).
+ * A self-check must pass it before ota_confirm(): an image whose verifier is broken would otherwise confirm and
+ * then refuse every later update. Any task; uses ~1.5 KiB of stack. */
+bool ota_verifier_ok(void);
 
 /* The running image is healthy: ends a pending trial. Safe to call any time, from any task. */
 void ota_confirm(void);

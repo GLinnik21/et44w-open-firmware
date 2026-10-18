@@ -1,5 +1,5 @@
 /* Boot policy of the port, pure: reset reason -> General Diagnostics BootReason, and the safe-mode fault counter
- * (a Matter crash loop must not take HomeKit-era recovery paths, OTA and netlog, down with it).
+ * (a Matter crash loop must not take the recovery paths, OTA and netlog, down with it).
  *
  * Counter ("SAFE" in the boot module): +1 on every watchdog reset (libs/wdog turns faults and hangs into one),
  * 0 after a power-on reset, unchanged after a software reset (OTA install, our own reboots). The boot that sees

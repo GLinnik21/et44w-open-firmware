@@ -1,5 +1,5 @@
-// TuyaMCU glue shared by the HAP (../thermostat) and Matter (../thermostat-matter) apps: which reports feed
-// the thermo model, thermo writes as TuyaMCU DP writes, and the MCU's time requests. No HAP or Matter code.
+// TuyaMCU glue: which reports feed the thermo model, thermo writes as TuyaMCU DP writes, and the MCU's time
+// requests. No Matter code.
 #ifndef THERMO_MCU_H
 #define THERMO_MCU_H
 

@@ -47,7 +47,7 @@
 #define BT_WHITELIST_BASE_1         (0x200000 - 0xA000)     //0x1F6000
 #define BT_WHITELIST_PAGE_SIZE      (0x1000)
 /*!< DCT begin address of flash, ex: 0x200000 = 2M, the default size of DCT is 24K; ; if backup enabled, the size is 48k; if wear leveling enabled, the size is 144k*/
-#define DCT_BEGIN_ADDR              0x1D1000                /* = kv in partitions.def (HomeKit firmware) */
+#define DCT_BEGIN_ADDR              0x1D1000                /* = kv in partitions.def (unused since HomeKit was removed) */
 /*!< FATFS begin address, default size used is 512KB (can be adjusted based on user requirement)*/
 /* FLASH_APP_BASE (FATFS, default 0x157000) would overlap ota2 in partitions.def: not defined. */
 

@@ -6,20 +6,18 @@
 # Create it once, never regenerate it for a commissioned unit (the QR code changes):
 #   make MATTER=1 APP=apps/thermostat-matter UNIT=<unit> SERIAL=<serial> SETUP_TXT=<file> matter-unit
 # SETUP_TXT receives the passcode, QR payload and manual code (keep it outside the repo, e.g. secrets/).
-# Shared with the HAP app (DRY, until a shared private lib exists): ../thermostat/clock.c (SNTP + TZ for the MCU), ../thermostat/thermo_mcu.c (TuyaMCU glue), ../thermostat/web.c +
-# dp_cache.c (the settings page on port 80),
-# ../thermostat/units/<UNIT>/unit.h (THERMOSTAT_NAME). Also needs wifi_credentials.h and ota_pubkey.h (see the
-# .example files; ota_pubkey.h must hold the real key or the image can never be updated over the air).
+# Per unit, tracked: units/<UNIT>/unit.h (THERMOSTAT_NAME, THERMOSTAT_SERIAL). Also needs wifi_credentials.h and
+# ota_pubkey.h (see the .example files; ota_pubkey.h must hold the real key or the image can never be updated over
+# the air).
 ifneq ($(MATTER),1)
 $(error apps/thermostat-matter needs MATTER=1)
 endif
 UNIT ?= example
-TM_HAP_APP := $(patsubst %/,%,$(dir $(d)))/thermostat
 TM_UNIT_H  := $(d)/units/$(UNIT)/matter_unit.h
 
 ifeq ($(filter matter-unit,$(MAKECMDGOALS)),)
 $(if $(wildcard $(TM_UNIT_H)),,$(error no $(TM_UNIT_H): create it with the matter-unit target (see lib.mk)))
-$(if $(wildcard $(TM_HAP_APP)/units/$(UNIT)/unit.h),,$(error no $(TM_HAP_APP)/units/$(UNIT)/unit.h))
+$(if $(wildcard $(d)/units/$(UNIT)/unit.h),,$(error no $(d)/units/$(UNIT)/unit.h))
 # The all-zero placeholder is a small-order key: libs/ota refuses every upload with it (forged signatures would
 # verify), so such an image could only be replaced over UART.
 $(if $(shell grep -E '0x[0-9a-fA-F]*[1-9a-fA-F]' $(d)/ota_pubkey.h 2>/dev/null),,$(error $(d)/ota_pubkey.h missing or all-zero))
@@ -31,16 +29,19 @@ endif
 LIBS += app
 # make BLE_WINDOW_S=<s>: shorter BLE window for debug builds (matter_config.h)
 app_CFLAGS := $(if $(BLE_WINDOW_S),-DBLE_WINDOW_S=$(BLE_WINDOW_S))
-app_SRC  := $(addprefix $(d)/,main.c thermo_link.c health.c) $(addprefix $(TM_HAP_APP)/,clock.c thermo_mcu.c web.c dp_cache.c) \
+app_SRC  := $(addprefix $(d)/,main.c thermo_link.c health.c clock.c thermo_mcu.c web.c dp_cache.c) \
             tools/matter-host/test_credentials.c
-app_INC  := $(d) $(d)/units/$(UNIT) $(TM_HAP_APP) $(TM_HAP_APP)/units/$(UNIT) tools/matter-host \
+app_INC  := $(d) $(d)/units/$(UNIT) tools/matter-host \
             $(OUT)/gen
 app_DEPS := sdk wifi_sta netlog ota ota_test wdog tuyamcu tuyamcu_port thermo tz httpd matter_port_ambz2 \
             matter_thermostat matter_core matter_tlv matter_crypto matter_cert matter_msg matter_xchg matter_btp matter_pase \
             matter_case matter_fabric matter_im matter_dm matter_root matter_node btp_port_ambz2 mbedtls
 
-TM_WEB_DIR := $(TM_HAP_APP)
-include $(TM_HAP_APP)/web.mk
+# The web page (web/index.html) compiled in as a byte array: $(OUT)/gen/web_page.h, for web.c.
+$(OUT)/gen/web_page.h: $(d)/web/index.html tools/embed_c.py
+	@mkdir -p $(dir $@)
+	python3 tools/embed_c.py $< $@ WebPage
+$(call obj,$(d)/web.c): $(OUT)/gen/web_page.h
 
 .PHONY: matter-unit
 matter-unit:

@@ -72,7 +72,7 @@ static void test_host(void)
     CHECK(http_host_is_local("192.168.1.50"));
     CHECK(http_host_is_local("192.168.1.50:80"));
     CHECK(http_host_is_local("hap-a1b2c3.local"));
-    CHECK(http_host_is_local("HAP-A1B2C3.LOCAL:8080"));
+    CHECK(http_host_is_local("MATTER-A1B2C3.LOCAL:8080"));
     CHECK(!http_host_is_local(""));
     CHECK(!http_host_is_local(".local"));
     CHECK(!http_host_is_local("evil.example.com"));

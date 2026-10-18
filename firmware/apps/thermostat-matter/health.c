@@ -13,7 +13,7 @@
 #include "ota_test.h"
 #include "thermo_link.h"
 
-#define S0_STACK_WORDS 768 // lwIP connect + printf; freed when the check ends
+#define S0_STACK_WORDS 1536 // lwIP connect + printf + the Ed25519 known-answer test; freed when the check ends
 
 static volatile bool ip_up;
 static void (*const confirm_hook)(void) = ota_test_confirm_hook; // NULL in OTA_TEST=never_confirm builds
@@ -72,20 +72,22 @@ static void s0_task(void *arg) {
     // IP usually comes from a commissioning still in progress (BLE, PASE and CASE all hold heap): resample until the
     // heap recovers or HEALTH_HEAP_RETRY_MS passes (the trial deadline leaves room for it).
     uint32_t until = uptime_ms() + HEALTH_HEAP_RETRY_MS;
+    bool verifier = ota_verifier_ok(); // a broken update verifier must roll back, not confirm and lock updates out
     bool ota, ok;
     unsigned free_b, min_b;
     for (;;) {
         ota = tcp_answers(OTA_PORT);
         free_b = (unsigned) xPortGetFreeHeapSize();
         min_b = (unsigned) xPortGetMinimumEverFreeHeapSize();
-        ok = ota && free_b >= HEALTH_HEAP_FREE_MIN && min_b >= HEALTH_HEAP_EVER_MIN;
+        ok = verifier && ota && free_b >= HEALTH_HEAP_FREE_MIN && min_b >= HEALTH_HEAP_EVER_MIN;
         if (ok || (int32_t) (uptime_ms() - until) >= 0) {
             break;
         }
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
-    printf("S0: %s at %lu s: ota %d, heap free %u min %u%s\n", ok ? "passed" : "FAILED",
-           (unsigned long) (uptime_ms() / 1000), (int) ota, free_b, min_b,
+    printf("S0: %s at %lu s: verifier %d, ota %d, heap free %u min %u, s0 stack free %u words%s\n",
+           ok ? "passed" : "FAILED", (unsigned long) (uptime_ms() / 1000), (int) verifier, (int) ota, free_b, min_b,
+           (unsigned) uxTaskGetStackHighWaterMark(NULL),
            !ok ? " -> not confirming" : confirm_hook ? " -> confirming" : " (OTA_TEST: not confirming)");
     if (ok && confirm_hook) {
         confirm_hook();

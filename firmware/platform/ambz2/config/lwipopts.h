@@ -1,11 +1,11 @@
-/* lwIP options for HomeKit firmware: the SDK's lwipopts.h plus our overrides.
+/* lwIP options for the firmware: the SDK's lwipopts.h plus our overrides.
  * Shadows component/common/api/network/include/lwipopts.h ($(d)/config comes first in sdk_INC). */
 #pragma once
 
 #include_next "lwipopts.h"
 
-/* Sockets: HAP needs 9 sessions + listener, plus OTA (1), netlog (2), web page (2: listener + client),
- * mDNS (raw UDP pcb) and room for SNTP/provisioning. The web server closes first, so each page poll
+/* Sockets: sized for the removed HomeKit firmware (9 sessions + listener) and kept, plus OTA (1), netlog (2), web
+ * page (2: listener + client), mDNS (raw UDP pcb) and room for SNTP/provisioning. The web server closes first, so each page poll
  * leaves a TCP PCB in TIME_WAIT (lwIP reuses those first when PCBs run out). */
 #undef  MEMP_NUM_NETCONN
 #define MEMP_NUM_NETCONN        18
@@ -14,7 +14,7 @@
 #undef  MEMP_NUM_UDP_PCB
 #define MEMP_NUM_UDP_PCB        12 /* DHCP, mDNS v4+v6, SNTP, DNS (random source port per query) ... */
 
-/* Rebind the HAP listener right after a restart (TIME_WAIT). */
+/* Rebind listeners right after a restart (TIME_WAIT). */
 #undef  SO_REUSE
 #define SO_REUSE                1
 

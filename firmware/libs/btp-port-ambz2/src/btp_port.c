@@ -1,5 +1,5 @@
 /* BLE task and Realtek glue for Matter commissioning (see include/btp_port.h). The init/teardown sequence is the
- * one measured with libs/ble-probe on the device: the stack costs its heap only while up, and bte_deinit gives all
+ * one measured with a BLE probe build on the device (removed): the stack costs its heap only while up, and bte_deinit gives all
  * but ~2.4 KiB of it back (hence one start per boot). */
 #include <stdio.h>
 #include <string.h>

@@ -5,16 +5,6 @@ Everything in this repository is under the MIT License (LICENSE), except the fil
 derived from Apache-2.0 sources and stay under the Apache License, Version 2.0 (LICENSE-APACHE-2.0). Their
 original copyright and licence headers are kept in the files.
 
-HomeKit ADK platform layer and accessory database
-(Copyright (c) 2015-2019 The HomeKit ADK Contributors; Copyright 2020 Espressif Systems (Shanghai) PTE LTD):
-  firmware/libs/hap-pal-ambz2/                    the whole directory
-  firmware/libs/hap-app/include/hap_db.h
-  firmware/libs/hap-app/src/db_info.c
-  firmware/libs/hap-app/src/db_pairing.c
-  firmware/libs/hap-app/src/hap_app.c             derived from the ADK Lightbulb example
-  firmware/apps/example-switch/switch.c           derived from the ADK Lightbulb example
-  firmware/apps/thermostat/thermostat_db.c        derived from the ADK Lightbulb example
-
 Matter test vectors and public test credentials
 (connectedhomeip, Copyright Project CHIP Authors; rs-matter, which copies connectedhomeip's examples):
   firmware/libs/matter-crypto/test/official_vectors.h
@@ -30,5 +20,6 @@ them in a product.
 
 firmware/platform/ambz2/config/FreeRTOSConfig.h keeps its Amazon.com, Inc. (MIT) header.
 
-The build downloads Apple's HomeKit ADK (Apache-2.0) and Realtek's ameba-rtos-z2 SDK (Realtek's licence terms)
-into firmware/vendor/ at the commits in firmware/vendor.lock; neither is redistributed in this repository.
+The build downloads Realtek's ameba-rtos-z2 SDK (Realtek's licence terms) and Monocypher (CC0-1.0 or BSD-2-Clause,
+used for Ed25519) into firmware/vendor/ at the commits in firmware/vendor.lock; neither is redistributed in this
+repository.

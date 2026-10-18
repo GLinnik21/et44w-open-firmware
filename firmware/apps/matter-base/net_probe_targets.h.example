@@ -1,4 +1,0 @@
-// Copy to net_probe_targets.h (git-ignored). Run a listener on a Home host first: nc -6 -lk <port>
-#define NET_PROBE_PORT       18080
-#define NET_PROBE_V6_TARGETS "fd00::1", "2001:db8::1" // the Home host's ULA and global address
-#define NET_PROBE_V4_TARGET  "192.168.1.10" // the Home host's IPv4 address

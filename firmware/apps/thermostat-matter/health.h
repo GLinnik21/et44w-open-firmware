@@ -18,7 +18,8 @@
 
 // main(): creates the self-check task. It confirms the OTA trial (libs/ota-test hook) once IP is up, UDP 5540 is
 // bound, the node runs, thermo is ready, BLE is not mid-start (uncommissioned: the stack is up, ~31 KiB), the OTA
-// listener answers on loopback and the heap is within limits (the thresholds hold with BLE up);
+// listener answers on loopback, the update verifier passes its known-answer test (ota_verifier_ok) and the heap is
+// within limits (the thresholds hold with BLE up);
 // otherwise it never confirms and a trial rolls back. Safe mode (node skipped) therefore never confirms.
 // Never without IP: while an uncommissioned unit is offline on purpose for its BLE window it keeps the trial open
 // (ota_extend_trial) instead, and must then get IP (commissioning or the rescue network) within HEALTH_NET_MS.

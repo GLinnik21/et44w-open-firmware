@@ -19,7 +19,7 @@ static struct {
     const char* fw;
 } web;
 
-#define SEND_CHUNK 1024 // lwIP copies sends into its own heap, which HAP/Matter share
+#define SEND_CHUNK 1024 // lwIP copies sends into its own heap, which Matter shares
 
 static dp_cache_snapshot snapshot; // one client at a time (httpd)
 

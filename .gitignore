@@ -16,9 +16,7 @@ matter-host-kv/
 # Per-device headers (create them from the .example files next to them)
 wifi_credentials.h
 ota_pubkey.h
-hap_setup_info.h
 matter_unit.h
-net_probe_targets.h
 
 # Downloaded sources (firmware/vendor.lock), toolchain, build output
 firmware/vendor

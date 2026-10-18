@@ -2,21 +2,29 @@
 
 Replacement firmware for the Wi-Fi module of the **ET-44W floor thermostat** (sold as Warmee, EXTHERM
 and others), a Tuya **WBR2** module with a Realtek **RTL8720CF** ("AmebaZ2"). It drops the Tuya cloud and
-puts the thermostat straight into **Apple Home**, with no bridge and no hub.
+puts the thermostat straight into **Apple Home** over **Matter**, with no bridge and no cloud.
 
 The thermostat logic (relay, sensors, keys, display, weekly schedule) keeps running on the separate
 thermostat MCU. This firmware only replaces the Wi-Fi side of the link, so the thermostat keeps heating
 even when the network is down.
 
-| | |
-|---|---|
-| **`thermostat`** (HomeKit, HAP over IP) | Thermostat tile (Off / Heat = manual / Auto = weekly program, 5–40 °C) + child lock switch. Uses Apple's HomeKit ADK. Pairs as an "uncertified accessory". Stable on two units |
-| **`thermostat-matter`** (Matter, **experimental**) | Our own compact Matter 1.3 implementation in C: commissioning from an iPhone over Bluetooth with Wi-Fi provisioning, then control from Apple Home. Uncertified, uses the Matter test vendor ID. Young code: read the caveats below |
-| Both | Local settings page on port 80 (every data point, decoded weekly schedule); signed over-the-air updates with automatic rollback; network log console on TCP 2323; watchdog |
+What it does:
+- **Matter 1.3 thermostat**, our own compact implementation in C. Add it from an iPhone over Bluetooth:
+  Apple Home hands it the Wi-Fi network. After that it's a Thermostat in Home: Off / Heat (manual) /
+  Auto (the MCU's weekly program), 5–40 °C in 0.5 °C steps. It works with several controllers (fabrics) at
+  once. Uncertified: it uses the Matter test vendor ID (read the caveats below).
+- **Local settings page** on port 80: every data point, the decoded weekly schedule, and the settings the
+  keys can also change (child lock, sensor, calibration, hysteresis, holiday days).
+- **Signed over-the-air updates** (Ed25519) with automatic rollback: a new image runs on trial and confirms
+  itself only after a self-check.
+- **Network log console** on TCP 2323, a watchdog, and a safe mode after repeated crashes.
+- **Reset:** hold + and − together. This erases the Matter fabrics and the stored network and opens a new
+  Bluetooth window.
 
 Also useful on their own:
 - `firmware/libs/tuyamcu`: a host-tested TuyaMCU protocol library (frame parser, DP codec, write allowlist).
-- `firmware/libs/hap-pal-ambz2`: the HomeKit ADK platform layer for AmebaZ2 (FreeRTOS, lwIP, mbedtls 3).
+- `firmware/libs/matter-*`: the Matter stack (TLV, PASE, CASE, interaction model, BTP over BLE). It is
+  portable C, host-tested, and reaches the hardware through one small port interface.
 - `scripts/ambz2_dump.py` / `ambz2_write.py`: reliable flash read/write through slow USB-UART bridges.
 - `firmware/tools/pack_image.py`: builds flashable AmebaZ2 images without Realtek's x86-only tools, so
   everything builds natively on Apple Silicon and arm64 Linux.
@@ -28,7 +36,7 @@ Also useful on their own:
 ## Hardware and first flash
 
 See [`docs/hardware-and-flashing.md`](docs/hardware-and-flashing.md): board, pads, download mode, stock
-backup, data-point map. The first flash needs a 3.3 V USB-serial adapter on two test pads; after that,
+backup, data-point map. The first flash needs a 3.3 V USB-serial adapter on two test pads. After that,
 updates go over Wi-Fi.
 
 ## Build
@@ -38,71 +46,76 @@ no Docker. All commands below run from `firmware/`.
 
 ```sh
 cd firmware
-tools/get-vendor.sh                  # Realtek SDK + Apple HomeKit ADK at the commits in vendor.lock
+tools/get-vendor.sh                  # Realtek SDK + Monocypher at the commits in vendor.lock
 python3.12 -m venv ../.venv-flash    # any Python >= 3.10; make uses ../.venv-flash/bin/python (or PYTHON=...)
 ../.venv-flash/bin/pip install ltchiptool typer construct pycryptodomex pyserial cryptography
 ```
 
-`ltchiptool` (plus `typer`, `construct` and `pycryptodomex`, which its AmbZ2 image code imports) packs the
-flash images, `pyserial` is for the flashing scripts, `cryptography` signs OTA images. ltchiptool needs
-Python 3.10 or newer: macOS's `/usr/bin/python3` is 3.9, so name a newer interpreter for the venv. The Arm
-GNU toolchain is downloaded (SHA-pinned) on the first `make`.
+What each package is for:
+- `ltchiptool` packs the flash images. It needs `typer`, `construct` and `pycryptodomex`, which its AmbZ2
+  image code imports.
+- `pyserial` is for the flashing scripts.
+- `cryptography` signs OTA images and generates the Matter setup.
+
+ltchiptool needs Python 3.10 or newer. macOS's `/usr/bin/python3` is 3.9, so name a newer interpreter for
+the venv. The Arm GNU toolchain is downloaded (SHA-pinned) on the first `make`.
 
 ### Per-device files
 
-They are git-ignored; each `.example` file next to them describes its format.
+They are git-ignored. Each `.example` file next to them describes its format.
 
 ```sh
-# Wi-Fi network, per app (used until the device is provisioned): copy, then edit (the Matter build
-# refuses the placeholder network)
-cp apps/example-switch/wifi_credentials.h.example apps/example-switch/wifi_credentials.h
-cp apps/thermostat/wifi_credentials.h.example apps/thermostat/wifi_credentials.h
+# Development Wi-Fi network: copy, then edit (the build refuses the placeholder). The unit joins it while
+# it has no network from Apple Home yet, and falls back to it as a rescue after the Bluetooth window.
 cp apps/thermostat-matter/wifi_credentials.h.example apps/thermostat-matter/wifi_credentials.h
 
-# OTA signing key, once: writes ../secrets/ota_signing.key (git-ignored) and apps/example-switch/ota_pubkey.h.
+# OTA signing key, once: writes ../secrets/ota_signing.key (git-ignored) and the public header.
 # Back the key up: without it, updates need the serial wires again.
-../.venv-flash/bin/python tools/ota_keygen.py
-../.venv-flash/bin/python tools/ota_keygen.py --header-only ../secrets/ota_signing.key apps/thermostat/ota_pubkey.h
-../.venv-flash/bin/python tools/ota_keygen.py --header-only ../secrets/ota_signing.key apps/thermostat-matter/ota_pubkey.h
-
-# HomeKit setup code (printed once, with the QR payload: note it)
-python3 tools/hap_setup.py apps/example-switch/hap_setup_info.h
-python3 tools/hap_setup.py apps/thermostat/units/example/hap_setup_info.h --category 9   # 9 = thermostat
+../.venv-flash/bin/python tools/ota_keygen.py ../secrets/ota_signing.key apps/thermostat-matter/ota_pubkey.h
 
 # Matter setup: the passcode, QR payload and manual code go only to SETUP_TXT (keep it out of the repo)
-make MATTER=1 APP=apps/thermostat-matter UNIT=example SERIAL=000000000001 \
-     SETUP_TXT=../secrets/example_matter_setup.txt matter-unit
+make UNIT=example SERIAL=000000000001 SETUP_TXT=../secrets/example_matter_setup.txt matter-unit
 ```
 
-A unit is a folder under `apps/thermostat/units/` (`unit.h`: name, serial, POSIX time zone; the example
-uses `UTC0`, set yours) plus its own `hap_setup_info.h`. For a second thermostat, copy
-`units/example` to `units/<name>`, give it its own serial, and generate its setup files with
-`UNIT=<name>`. The Matter build also reads `apps/thermostat/units/<name>/unit.h`.
+A unit is a folder under `apps/thermostat-matter/units/`:
+- `unit.h` holds the name and serial.
+- `matter_unit.h` is generated by the `matter-unit` target and is git-ignored. Generate it once per unit
+  and never again for a commissioned unit, because the QR code changes.
+
+For a second thermostat, copy `units/example` to `units/<name>`, give it its own serial, and run
+`matter-unit` with `UNIT=<name>`. Set your time zone (POSIX TZ) as `THERMOSTAT_TZ` in
+`apps/thermostat-matter/matter_config.h`.
 
 ### Firmware
 
 ```sh
-make                                                                    # apps/example-switch -> out/
-make APP=apps/thermostat UNIT=example                                   # HomeKit thermostat -> out/
-make MATTER=1 APP=apps/thermostat-matter UNIT=example OUT=out-matter/example   # Matter (experimental)
+make UNIT=example OUT=out-matter/example
 ```
 
-make doesn't track flags: run `make clean` (or use another `OUT=`) when you switch `APP` or `UNIT`.
-Outputs in the out dir: `image_flash_wipe.0x000000.bin` (first flash over UART, see
-[`docs/hardware-and-flashing.md`](docs/hardware-and-flashing.md)) and `image_firmware_is.0x010000.bin`
-(over-the-air update).
+make doesn't track `UNIT`, so use one `OUT=` per unit (or `make clean`). Outputs in the out dir:
+- `image_flash_wipe.0x000000.bin`: the first flash, over UART. See
+  [`docs/hardware-and-flashing.md`](docs/hardware-and-flashing.md).
+- `image_firmware_is.0x010000.bin`: over-the-air updates.
+
+### Adding it to Apple Home
+
+Scan the QR code from your `SETUP_TXT` in Home → Add Accessory and accept the "Uncertified Accessory"
+prompt. The unit advertises over Bluetooth for 15 minutes after power-up while it has no network; the
+Wi-Fi icon blinks fast meanwhile.
+
+The iPhone must be on the 2.4 GHz network the thermostat should join. If that network isolates Wi-Fi
+clients from each other (AP or peer isolation), turn the isolation off for the few minutes of setup.
 
 ### Updates over Wi-Fi
 
 ```sh
-../.venv-flash/bin/python tools/ota_push.py out/image_firmware_is.0x010000.bin --host <device-ip> \
-    --key ../secrets/ota_signing.key
+../.venv-flash/bin/python tools/ota_push.py out-matter/example/image_firmware_is.0x010000.bin \
+    --host <device-ip> --key ../secrets/ota_signing.key
 ```
 
-This speaks OTA format v2 (the signed header is checked before the module erases anything), which is
-what this firmware accepts. `--legacy` sends the old v1 format, only for a unit still running firmware
-from before OTA v2; v2 firmware refuses it. A new image runs on trial and rolls back unless it comes
-up healthy.
+The signed header is checked before the module erases anything. A new image runs on trial and rolls back
+unless it comes up healthy: Wi-Fi, Matter and the MCU link up, enough free heap, and the update verifier
+passing its known-answer test.
 
 ### Tests
 
@@ -113,31 +126,35 @@ make -C tools/matter-host test                                # Matter node on t
 ../.venv-flash/bin/python tools/ota_push.py --self-test
 ```
 
-`libs/ota/test` builds the ADK's Ed25519, so run `tools/get-vendor.sh` first. The optional matter.js
-end-to-end test (`make -C tools/matter-host e2e`) needs Node.js and matter.js installed once with
-`npm install --prefix out-host/matterjs @matter/nodejs-shell@0.17.9` (or point `MATTERJS_CTL_DIR` at an
-existing install). Layering rules and design decisions:
-[`firmware/ARCHITECTURE.md`](firmware/ARCHITECTURE.md).
+Run `tools/get-vendor.sh` first: `libs/ota/test` builds Monocypher's Ed25519, and the Matter tests build the
+SDK's mbedtls.
+
+The optional matter.js end-to-end test (`make -C tools/matter-host e2e`) needs Node.js and matter.js.
+Install matter.js once with `npm install --prefix out-host/matterjs @matter/nodejs-shell@0.17.9`, or point
+`MATTERJS_CTL_DIR` at an existing install.
+
+Layering rules and design decisions are in [`firmware/ARCHITECTURE.md`](firmware/ARCHITECTURE.md).
 
 ## Caveats
 
-- **Not certified by Apple or the CSA.** Apple Home shows an "Uncertified Accessory" prompt. The Matter
-  build uses the official *test* vendor ID and test attestation certificates, which is fine for your own
-  home and not for a product.
-- **The Matter stack is experimental.** It's a new, compact implementation of a security protocol. It works
-  with Apple Home on iOS, but hasn't had an independent security review.
+- **Not certified by Apple or the CSA.** Apple Home shows an "Uncertified Accessory" prompt and names the
+  accessory "Matter Accessory" until you rename it. The build uses the official *test* vendor ID and test
+  attestation certificates. That's fine for your own home, not for a product.
+- **The Matter stack is young.** It's a new, compact implementation of a security protocol. It works with
+  Apple Home on iOS but hasn't had an independent security review.
 - **No login on the settings page.** It's meant for a trusted LAN. It refuses foreign `Host` headers and
   cross-site POSTs, but anyone on your network can change settings. Put IoT devices on their own network.
-- The network log on port 2323 is unauthenticated, for the same reason.
-- Flashing replaces the Tuya firmware. Keep your stock dump to go back.
+- **The network log on port 2323 is unauthenticated**, for the same reason.
+- **Flashing replaces the Tuya firmware.** Keep your stock dump so you can go back.
+
+An earlier HomeKit (HAP) prototype was dropped before release: it had no way to give the unit its Wi-Fi
+network, which Matter's Bluetooth commissioning solves.
 
 ## Licence
 
-MIT, see [`LICENSE`](LICENSE). Files derived from Apache-2.0 sources keep their headers and stay under
-the Apache License 2.0 ([`LICENSE-APACHE-2.0`](LICENSE-APACHE-2.0)): the HomeKit ADK platform layer
-(`firmware/libs/hap-pal-ambz2/`), the accessory database code derived from the ADK and Espressif
-(`hap_db.h`, `db_*.c` and `hap_app.c` in `firmware/libs/hap-app/`, `thermostat_db.c`, the example's `switch.c`) and Matter test vectors and test credentials
-from connectedhomeip and rs-matter. [`NOTICE`](NOTICE) lists every such file.
+MIT, see [`LICENSE`](LICENSE). The Matter test vectors and test credentials from connectedhomeip and
+rs-matter stay under the Apache License 2.0 ([`LICENSE-APACHE-2.0`](LICENSE-APACHE-2.0)) with their
+headers. [`NOTICE`](NOTICE) lists every such file.
 
-The build downloads Apple's HomeKit ADK (Apache-2.0) and Realtek's ameba-rtos-z2 SDK under their own
-licences; neither is redistributed here.
+The build downloads Realtek's ameba-rtos-z2 SDK and Monocypher (CC0-1.0 / BSD-2-Clause) under their own
+licences. Neither is redistributed here.

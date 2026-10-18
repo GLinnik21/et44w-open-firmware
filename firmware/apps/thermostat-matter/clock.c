@@ -8,7 +8,7 @@
 #include "sntp/sntp.h"
 #include "task.h"
 
-#include "config.h"
+#include "matter_config.h"
 #include "tz.h"
 
 static tz_zone zone;

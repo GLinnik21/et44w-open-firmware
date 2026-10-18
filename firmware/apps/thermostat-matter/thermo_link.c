@@ -1,6 +1,5 @@
-// See thermo_link.h. Same behaviour as the HAP app's mcu_link.c + thermostat.c (500 ms write debounce, resync
-// with a full query when a report or write is dropped, MCU Wi-Fi icon from the network state), with Matter in
-// place of the HAP run loop.
+// See thermo_link.h. 500 ms write debounce, resync with a full query when a report or write is dropped, MCU Wi-Fi
+// icon from the network state.
 #include "thermo_link.h"
 
 #include <stdio.h>
@@ -11,12 +10,12 @@
 
 #include "lwip_netconf.h" // xnetif
 
-#include "clock.h"       // apps/thermostat/clock.c: SNTP time
-#include "dp_cache.h"    // apps/thermostat: every DP for the web page
+#include "clock.h"       // SNTP time
+#include "dp_cache.h"    // every DP for the web page
 #include "matter_config.h"
 #include "mt_thermostat.h"
 #include "mtp_port.h"
-#include "thermo_mcu.h" // apps/thermostat: shared TuyaMCU glue
+#include "thermo_mcu.h" // TuyaMCU glue
 #include "tuyamcu_port.h"
 
 #define REPORT_QUEUE_LEN  24     // the MCU reports ~19 DPs at once; only the thermo ones are queued

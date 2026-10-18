@@ -1,6 +1,0 @@
-// Copy to hap_setup_info.h (git-ignored). Generate it with tools/hap_setup.py; it must define:
-//   HAP_SETUP_INFO_INIT  initializer for a `const HAPSetupInfo` ({ .salt = {16 bytes}, .verifier = {384 bytes} })
-//   HAP_SETUP_ID         4-character setup ID string (for the setup payload / QR code)
-// The values below are placeholders and will NOT pair.
-#define HAP_SETUP_INFO_INIT { .salt = { 0 }, .verifier = { 0 } }
-#define HAP_SETUP_ID        "ABCD"

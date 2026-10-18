@@ -20,9 +20,9 @@
 #include "ota_test.h"
 #include "test_credentials.h" // TEST attestation: public connectedhomeip DAC/PAI/CD (VID 0xFFF1, PID 0x8000)
 #include "thermo_link.h"
-#include "unit.h"             // apps/thermostat/units/<UNIT>: THERMOSTAT_NAME
+#include "unit.h"             // units/<UNIT>: THERMOSTAT_NAME
 #include "wdog.h"
-#include "web.h"              // apps/thermostat: settings page on port 80
+#include "web.h"              // settings page on port 80
 
 #if __has_include("matter_unit.h")
 #include "matter_unit.h"

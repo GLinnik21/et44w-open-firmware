@@ -17,27 +17,24 @@
 //     Realtek bootloader needs only the partition-table records boot, FW1, FW2.
 //   - ota1/ota2 are 0xE0000 (896 KiB) each, 64 KiB aligned. The bootloader remaps XIP per slot, so
 //     both slots hold the same linked image (serial number decides which one boots).
-//   - factory: reserved for a read-only per-unit record. Unused so far: the HAP setup info is compiled in
-//       (tools/hap_setup.py -> hap_setup_info.h). Never inside a slot.
-//   - kv: Realtek DCT with backup. 12 modules x 4 KiB x2 (backup) = 96 KiB.
-//       needed: HAP domains 0x00,0x40,0x80,0x90,0x92,0xA0 (6) + Wi-Fi, OTA state, app (3) = 9
-//       modules, plus slack (the DCT may keep a module-name table; the closed lib_dct is unverified).
-//       dct_init(FLASH_kv_OFFSET, FLASH_KV_DCT_MODULES (12), 3, 128, /*backup*/1, /*wear_leveling*/0): variable
-//       names are 3 bytes (2 hex chars + NUL, libs/hap-pal-ambz2 HAPPlatformKeyValueStore.c). That is the
-//       on-flash format: changing it loses the stored pairings.
+//   - factory: reserved for a read-only per-unit record. Unused so far: the Matter setup data is compiled in
+//       (units/<UNIT>/matter_unit.h). Never inside a slot.
+//   - kv: Realtek DCT with backup, 12 modules x 4 KiB x2 (backup) = 96 KiB. Written only by the removed HomeKit
+//       firmware (pairings, Wi-Fi); the Matter firmware never writes it. Kept in the map so the layout of units
+//       that ran HomeKit stays as it was.
 //   - ota_state: one sector, written append-only (bits only cleared) by libs/ota; erased = no update
 //       on trial. Kept out of the DCT so a rollback never depends on the KV store.
-//   - matter: Matter builds only (MATTER=1): Realtek DCT second instance (dct_init2), 6 modules x 4 KiB
-//       x2 (backup) = 48 KiB: boot, node, m1..m4 (libs/matter-port-ambz2/src/store.c). HAP builds never
-//       touch it, and the Matter app never writes kv or ota_state.
+//   - matter: Realtek DCT second instance (dct_init2), 6 modules x 4 KiB
+//       x2 (backup) = 48 KiB: boot, node, m1..m4 (libs/matter-port-ambz2/src/store.c). The Matter app never
+//       writes kv or ota_state.
 //   - sdk_reserved: the SDK's fixed sectors (platform_opts.h) all lie in 0x1F6000..0x1FFFFF:
 //       BT whitelist 0x1F6000/0x1F7000, BT static random 0x1FA000, UART_SETTING_SECTOR 0x1FB000,
 //       BT FTL 0x1FC000..0x1FE000, FAST_RECONNECT_DATA 0x1FF000. We keep that whole range out of
 //       the way: fast-reconnect never writes (platform/ambz2/src/sdk_glue.c leaves p_write_reconnect_ptr NULL;
 //       wifi_conf.c only reads FAST_RECONNECT_DATA), and the UART-setting backup belongs to the AT console,
 //       which isn't built.
-//       Exception: BT builds (BT=1, so every MATTER=1 build) run the BT stack's ftl_init at 0x1FC000,
-//       inside sdk_reserved (libs/ble-probe already does). Nothing of ours is placed there.
+//       Exception: the BT stack's ftl_init (every build has BT) runs at 0x1FC000, inside sdk_reserved.
+//       Nothing of ours is placed there.
 //   - sdk_backup (0x3000) is the SDK's FLASH_BAKEUP_SECTOR.
 
 FLASH_TOTAL(0x200000)

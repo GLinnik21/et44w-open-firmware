@@ -2,9 +2,7 @@
 // erase + write the image with its boot mark held back as 0xFF, check it hashes to the signed hash, re-read
 // the slot and check it hashes the same, record the trial, then program the boot mark. A cut before the last
 // step leaves the old slot as the only bootable one; an unsigned upload never erases anything.
-#include "HAPBase.h" // first: defines what HAPCrypto.h needs, and must precede libc headers
-#include "HAPCrypto.h"
-
+#include "ota.h"
 #include "ota_receive.h"
 #include "ota_flash.h"
 #include "ota_state.h"
@@ -15,6 +13,7 @@
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
 #include "mbedtls/sha512.h"
+#include "monocypher-ed25519.h"
 
 #define HEADER_MAGIC "AOT2"
 #define LEGACY_MAGIC "AOTA" // v1: signature over the whole image, checked only after the slot was overwritten
@@ -101,7 +100,21 @@ static bool SignatureValid(const header_v2* h, const uint8_t key[32]) {
     uint8_t message[sizeof SIGN_DOMAIN - 1 + SIGNED_SIZE];
     memcpy(message, SIGN_DOMAIN, sizeof SIGN_DOMAIN - 1);
     memcpy(message + sizeof SIGN_DOMAIN - 1, h->signedPart, SIGNED_SIZE);
-    return HAP_ed25519_verify(h->sig, message, sizeof message, key) == 0;
+    return crypto_ed25519_check(h->sig, key, message, sizeof message) == 0;
+}
+
+bool ota_verifier_ok(void) {
+    static const uint8_t pk[32] = { 0x3d, 0x40, 0x17, 0xc3, 0xe8, 0x43, 0x89, 0x5a, 0x92, 0xb7, 0x0a, 0xa7, 0x4d, 0x1b, 0x7e, 0xbc,
+                                    0x9c, 0x98, 0x2c, 0xcf, 0x2e, 0xc4, 0x96, 0x8c, 0xc0, 0xcd, 0x55, 0xf1, 0x2a, 0xf4, 0x66, 0x0c };
+    static const uint8_t sig[64] = { 0x92, 0xa0, 0x09, 0xa9, 0xf0, 0xd4, 0xca, 0xb8, 0x72, 0x0e, 0x82, 0x0b, 0x5f, 0x64, 0x25, 0x40,
+                                     0xa2, 0xb2, 0x7b, 0x54, 0x16, 0x50, 0x3f, 0x8f, 0xb3, 0x76, 0x22, 0x23, 0xeb, 0xdb, 0x69, 0xda,
+                                     0x08, 0x5a, 0xc1, 0xe4, 0x3e, 0x15, 0x99, 0x6e, 0x45, 0x8f, 0x36, 0x13, 0xd0, 0xf1, 0x1d, 0x8c,
+                                     0x38, 0x7b, 0x2e, 0xae, 0xb4, 0x30, 0x2a, 0xee, 0xb0, 0x0d, 0x29, 0x16, 0x12, 0xbb, 0x0c, 0x00 };
+    static const uint8_t msg[1] = { 0x72 }; /* RFC 8032 section 7.1, test 2 */
+    uint8_t bad[64];
+    memcpy(bad, sig, sizeof bad);
+    bad[63] ^= 0x01;
+    return crypto_ed25519_check(sig, pk, msg, sizeof msg) == 0 && crypto_ed25519_check(bad, pk, msg, sizeof msg) != 0;
 }
 
 const char* ota_receive(int sock, const uint8_t publicKey[32]) {

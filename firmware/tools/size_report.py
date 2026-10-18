@@ -42,8 +42,6 @@ def owner(path):
         return "mbedtls"
     if "lwip" in p:
         return "lwip"
-    if "HomeKitADK" in p or "homekit" in p.lower():
-        return "adk"
     if p.startswith("vendor/"):
         return "sdk"
     return "other"

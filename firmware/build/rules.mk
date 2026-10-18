@@ -28,6 +28,6 @@ endef
 
 $(OUT)/obj/%.o: %.c
 	$(compile)
-# Sources outside firmware/ (e.g. APP=apps/thermostat) build under out/obj/__/.
+# Sources outside firmware/ (e.g. APP=apps/thermostat-matter) build under $(OUT)/obj/__/.
 $(OUT)/obj/__/%.o: ../%.c
 	$(compile)

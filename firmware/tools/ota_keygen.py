@@ -4,9 +4,9 @@
   tools/ota_keygen.py [<private-key-out> [<public-header-out>]] [--force | --header-only]
 
 Defaults: secrets/ota_signing.key (raw 32-byte seed as hex on one line, mode 0600) and
-apps/example-switch/ota_pubkey.h (OTA_PUBLIC_KEY_INIT, 32 bytes, for `static const uint8_t key[32]`).
-Each app includes its own ota_pubkey.h, so pass the app's header path, e.g. from the repo root:
-  python3 firmware/tools/ota_keygen.py --header-only secrets/ota_signing.key firmware/apps/thermostat/ota_pubkey.h
+apps/thermostat-matter/ota_pubkey.h (OTA_PUBLIC_KEY_INIT, 32 bytes, for `static const uint8_t key[32]`).
+To rewrite the app's header from the existing key, from the repo root:
+  python3 firmware/tools/ota_keygen.py --header-only secrets/ota_signing.key firmware/apps/thermostat-matter/ota_pubkey.h
 Refuses to overwrite an existing private key without --force. --header-only rewrites just the header
 from an existing key. Needs the `cryptography` package.
 """
@@ -19,7 +19,7 @@ except ImportError:
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DEF_KEY = os.path.join(ROOT, "secrets", "ota_signing.key")
-DEF_HDR = os.path.join(ROOT, "firmware", "apps", "example-switch", "ota_pubkey.h")
+DEF_HDR = os.path.join(ROOT, "firmware", "apps", "thermostat-matter", "ota_pubkey.h")
 
 
 def public_bytes(key):

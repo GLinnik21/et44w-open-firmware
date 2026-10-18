@@ -118,7 +118,4 @@ typedef struct {
 } mt_case_session;
 mt_err mt_case_session_keys(const mt_case *c, mt_case_session *out);
 
-/* Older name of mt_sc_status, still used by apps/matter-cryptolink. */
-#define mt_case_status mt_sc_status
-
 #endif

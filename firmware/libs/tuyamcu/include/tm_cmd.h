@@ -25,8 +25,8 @@ enum {
     TM_NET_PAIRING = 0x00,  /* waiting for setup (Tuya: EZ/smartconfig, the icon blinks fast) */
     TM_NET_SOFTAP = 0x01,
     TM_NET_NO_LINK = 0x02,  /* credentials stored, not connected */
-    TM_NET_UNPAIRED = 0x03, /* on Wi-Fi, not HAP-paired */
-    TM_NET_PAIRED = 0x04    /* on Wi-Fi, HAP-paired */
+    TM_NET_UNPAIRED = 0x03, /* on Wi-Fi, not paired to a controller */
+    TM_NET_PAIRED = 0x04    /* on Wi-Fi, paired to a controller */
 };
 
 #endif

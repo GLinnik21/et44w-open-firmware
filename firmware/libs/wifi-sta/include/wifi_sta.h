@@ -1,5 +1,5 @@
 // Wi-Fi station: connects with the given credentials, runs DHCP, and keeps the link up. Knows
-// nothing about HomeKit; the caller passes a callback.
+// nothing about Matter; the caller passes a callback.
 #ifndef WIFI_STA_H
 #define WIFI_STA_H
 

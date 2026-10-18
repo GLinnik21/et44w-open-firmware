@@ -41,12 +41,14 @@ static void test_real_key_accepted(void)
 }
 
 void run_receive_tests(void);
+void run_ed25519_tests(void);
 
 int main(void)
 {
     RUN(test_placeholder_refused);
     RUN(test_small_order_refused);
     RUN(test_real_key_accepted);
+    run_ed25519_tests();
     run_receive_tests();
     printf("%d checks, %d failed\n", t_checks, t_fails);
     return t_fails != 0;

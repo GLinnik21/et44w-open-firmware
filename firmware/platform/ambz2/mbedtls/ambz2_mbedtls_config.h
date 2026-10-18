@@ -1,4 +1,4 @@
-/* mbedtls 3.1.0 (from the SDK), crypto only: what HomeKit needs and nothing else.
+/* mbedtls 3.1.0 (from the SDK), crypto only: the base set (extended by ambz2_mbedtls_matter_config.h).
  *   Pair Setup:  SRP-3072 (bignum) + SHA-512, HKDF-SHA-512
  *   Pair Verify: X25519 (ECDH on Curve25519), ChaCha20-Poly1305
  *   Ed25519 comes with the ADK; AES-CTR, SHA-1 and PBKDF2 are used by other ADK helpers.

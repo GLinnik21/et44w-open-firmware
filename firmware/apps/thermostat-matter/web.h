@@ -1,5 +1,5 @@
-// Local web page with every thermostat setting: http://<ip>/ or http://<mdns host>.local/. Shared by the HAP
-// and Matter apps: the MCU link must call dp_cache_put() for every DP report.
+// Local web page with every thermostat setting: http://<ip>/ or http://<mdns host>.local/. The MCU link must
+// call dp_cache_put() for every DP report.
 //   GET  /           the page (web/index.html, embedded at build time)
 //   GET  /api/state  JSON: all reported DPs, the weekly schedule records, firmware and heap
 //   POST /api/dp     form "dp=<id>&v=<value>": one DP write, checked against libs/thermo thermo_dp.c

@@ -1,5 +1,5 @@
 // Last reported value of every MCU data point, for the web page. Written on the TuyaMCU port task,
-// read as a snapshot from any task (short critical sections; no HAP run-loop involvement).
+// read as a snapshot from any task (short critical sections).
 #ifndef DP_CACHE_H
 #define DP_CACHE_H
 

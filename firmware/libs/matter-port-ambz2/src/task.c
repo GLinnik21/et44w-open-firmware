@@ -12,7 +12,7 @@
  *
  * Stack 8 KiB (CASE / PASE crypto runs here; its peak stack use was measured on the host). Priority tskIDLE + 1,
  * the same as the watchdog feeder, OTA and netlog: round-robin with them, so a 1-2 s CASE computation cannot
- * starve the feeder and the HAP-era recovery paths stay responsive. */
+ * starve the feeder and the recovery paths (OTA, netlog) stay responsive. */
 #include <stdio.h>
 #include <string.h>
 
