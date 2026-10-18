@@ -5,7 +5,6 @@
  * byte, and the DER signature must equal the TLV signature. CSR: checked by `openssl req -verify`
  * (skipped with a message when openssl is missing) and by an independent in-test DER walk.
  * Time conversions: boundary dates computed by hand (2049-12-31 23:59:59 UTC, 2050-01-01, 2000-02-29). */
-#define _POSIX_C_SOURCE 200809L /* popen/pclose under -std=c11 (glibc hides them otherwise) */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
