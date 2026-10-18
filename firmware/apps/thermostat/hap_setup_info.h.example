@@ -1,0 +1,8 @@
+// Copy to units/<UNIT>/hap_setup_info.h (git-ignored). Generate it from firmware/ with
+//   python3 tools/hap_setup.py apps/thermostat/units/<UNIT>/hap_setup_info.h --category 9
+// (9 = thermostat; the tool's default 8 = switch would put the wrong category in the QR code). It must define:
+//   HAP_SETUP_INFO_INIT  initializer for a `const HAPSetupInfo` ({ .salt = {16 bytes}, .verifier = {384 bytes} })
+//   HAP_SETUP_ID         4-character setup ID string (for the setup payload / QR code)
+// The values below are placeholders and will NOT pair.
+#define HAP_SETUP_INFO_INIT { .salt = { 0 }, .verifier = { 0 } }
+#define HAP_SETUP_ID        "ABCD"

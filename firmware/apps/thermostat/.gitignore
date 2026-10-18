@@ -1,0 +1,5 @@
+# Per-device secrets (see the .example files)
+hap_setup_info.h
+units/*/hap_setup_info.h
+wifi_credentials.h
+ota_pubkey.h

@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="790" viewBox="0 0 880 790">
+  <title>Wiring a 3.3 V USB-serial adapter to the ET-44W front unit for UART download mode</title>
+  <defs>
+    <style>
+      text { font-family: -apple-system, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #1d1d1f; }
+      .mono, .mono text { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+      .title { font-size: 22px; font-weight: 600; letter-spacing: -0.2px; }
+      .sub { font-size: 14px; fill: #6e6e73; }
+      .h { font-size: 14px; font-weight: 600; }
+      .pin { font-size: 14px; font-weight: 600; }
+      .note { font-size: 13px; fill: #6e6e73; }
+      .wl { font-size: 13px; fill: #6e6e73; text-anchor: middle; }
+      .body { font-size: 14px; }
+      .dim { fill: #aeaeb2; }
+      .wire { fill: none; stroke-width: 2; stroke-linecap: round; }
+      .lead { fill: none; stroke: #aeaeb2; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <!-- solid background so it never renders transparently on a dark page -->
+  <rect x="0" y="0" width="880" height="790" rx="14" fill="#ffffff"/>
+  <rect x="0.5" y="0.5" width="879" height="789" rx="14" fill="none" stroke="#e5e5ea"/>
+
+  <text x="32" y="48" class="title">Flash wiring: USB-serial adapter → front unit</text>
+  <text x="32" y="72" class="sub">Power through P1 GND and XP1 VCC; data and boot straps on the WBR2 module. Stylised, positions not exact.</text>
+
+  <!-- panels -->
+  <rect x="32" y="104" width="216" height="456" rx="12" fill="#f5f5f7"/>
+  <text x="52" y="134" class="h">3.3 V USB-serial adapter</text>
+
+  <rect x="576" y="104" width="272" height="226" rx="12" fill="#eef3ef"/>
+  <text x="596" y="134" class="h">Front board: <tspan class="mono">P1</tspan>, <tspan class="mono">XP1</tspan></text>
+
+  <rect x="576" y="350" width="272" height="210" rx="12" fill="#f5f5f7"/>
+  <text x="596" y="380" class="h">WBR2 module</text>
+
+  <!-- adapter pins (rows: 212 GND, 296 3V3 / 400, 440, 480, 520) -->
+  <g class="pin mono" text-anchor="end">
+    <text x="232" y="217">GND</text>
+    <text x="232" y="301">3V3</text>
+    <text x="232" y="405">TX</text>
+    <text x="232" y="445">RX</text>
+    <text x="232" y="485">GPIO</text>
+    <text x="232" y="525">3V3</text>
+  </g>
+  <g class="note" text-anchor="end">
+    <text x="232" y="502">e.g. Flipper RTS/DTR pin</text>
+    <text x="232" y="542">2nd lead, hand-held</text>
+  </g>
+
+  <!-- wires -->
+  <line class="wire" x1="248" y1="212" x2="596" y2="212" stroke="#1d1d1f"/>
+  <line class="wire" x1="248" y1="296" x2="596" y2="296" stroke="#e0322b"/>
+  <line class="wire" x1="248" y1="400" x2="596" y2="400" stroke="#0a6fdb"/>
+  <line class="wire" x1="248" y1="440" x2="596" y2="440" stroke="#0a6fdb"/>
+  <line class="wire" x1="248" y1="480" x2="596" y2="480" stroke="#8e3fd0"/>
+  <line class="wire" x1="248" y1="520" x2="596" y2="520" stroke="#8e3fd0" stroke-dasharray="6 5"/>
+
+  <!-- wire labels, above each wire -->
+  <text x="412" y="202" class="wl">soldered</text>
+  <text x="412" y="286" class="wl">jump wire into the XP1 socket (back side)</text>
+  <text x="412" y="390" class="wl">data to the module  →</text>
+  <text x="412" y="430" class="wl">←  data from the module</text>
+  <text x="412" y="470" class="wl">held high at power-up</text>
+  <text x="412" y="510" class="wl">touch, power up, then release</text>
+
+  <!-- adapter terminals -->
+  <circle cx="248" cy="212" r="5" fill="#1d1d1f"/>
+  <circle cx="248" cy="296" r="5" fill="#e0322b"/>
+  <circle cx="248" cy="400" r="5" fill="#0a6fdb"/>
+  <circle cx="248" cy="440" r="5" fill="#0a6fdb"/>
+  <circle cx="248" cy="480" r="5" fill="#8e3fd0"/>
+  <circle cx="248" cy="520" r="5" fill="#8e3fd0"/>
+
+  <!-- P1 holes, top to bottom: DA, CK, GND, VCC (square pad); then XP1 VCC -->
+  <g stroke="#aeaeb2" stroke-width="1" fill="#ffffff">
+    <circle cx="604" cy="160" r="8"/>
+    <circle cx="604" cy="186" r="8"/>
+    <rect x="596" y="230" width="16" height="16" rx="1.5"/>
+  </g>
+  <circle cx="604" cy="212" r="8" fill="#1d1d1f"/>
+  <circle cx="604" cy="296" r="8" fill="#e0322b"/>
+  <g fill="#d1d1d6"><circle cx="604" cy="160" r="3"/><circle cx="604" cy="186" r="3"/><circle cx="604" cy="238" r="3"/></g>
+  <circle cx="604" cy="212" r="3" fill="#ffffff"/>
+  <!-- same trace: P1 VCC to XP1 VCC -->
+  <path class="lead" d="M 590 238 L 584 238 L 584 296 L 590 296" stroke-dasharray="2 3"/>
+
+  <g class="pin mono">
+    <text x="624" y="165" class="dim">DA</text>
+    <text x="624" y="191" class="dim">CK</text>
+    <text x="624" y="217">GND</text>
+    <text x="624" y="243" class="dim">VCC</text>
+    <text x="624" y="301">VCC</text>
+  </g>
+  <path class="lead" d="M 650 156 L 656 156 L 656 190 L 650 190"/>
+  <text x="666" y="178" class="note">don't connect</text>
+  <text x="666" y="217" class="note">P1</text>
+  <text x="666" y="243" class="note">P1 square pad, unused</text>
+  <text x="666" y="301" class="note">XP1, socket on the back</text>
+  <text x="666" y="318" class="note">end farthest from P1</text>
+
+  <!-- WBR2 points: round = back pad, bar = edge pin -->
+  <circle cx="604" cy="400" r="8" fill="#0a6fdb"/>
+  <circle cx="604" cy="440" r="8" fill="#0a6fdb"/>
+  <circle cx="604" cy="480" r="8" fill="#8e3fd0"/>
+  <rect x="599" y="510" width="10" height="20" rx="2" fill="#8e3fd0"/>
+  <g class="pin mono">
+    <text x="624" y="405">Log_Rx</text>
+    <text x="624" y="445">Log_Tx</text>
+    <text x="624" y="485">A_0</text>
+    <text x="624" y="525">A13</text>
+  </g>
+  <g class="note">
+    <text x="700" y="405">back pad</text>
+    <text x="700" y="445">back pad</text>
+    <text x="700" y="485">back pad, PA00</text>
+    <text x="700" y="525">edge pin 5</text>
+  </g>
+
+  <!-- notes -->
+  <rect x="32" y="588" width="400" height="170" rx="12" fill="#f5f5f7"/>
+  <path d="M 62 606 L 73 626 L 51 626 Z" fill="none" stroke="#e0322b" stroke-width="1.5" stroke-linejoin="round"/>
+  <line x1="62" y1="613" x2="62" y2="619" stroke="#e0322b" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="62" cy="622.5" r="0.9" fill="#e0322b"/>
+  <text x="84" y="624" class="h" style="fill:#c4221c">Mains safety</text>
+  <text x="52" y="656" class="body">Work on the front unit only, unclipped from</text>
+  <text x="52" y="678" class="body">the mains base, which stays unplugged.</text>
+  <text x="52" y="700" class="body">Never connect while it sits on the powered</text>
+  <text x="52" y="722" class="body">base: the base has a non-isolated supply.</text>
+
+  <rect x="448" y="588" width="400" height="170" rx="12" fill="#f5f5f7"/>
+  <text x="468" y="624" class="h">Download mode</text>
+  <text x="468" y="656" class="body"><tspan class="mono">A_0</tspan> and <tspan class="mono">A13</tspan> must both be high at power-up.</text>
+  <text x="468" y="678" class="note"><tspan class="mono">A13</tspan> is shared with the CBM7326, so it is</text>
+  <text x="468" y="696" class="note">held by hand and released once powered.</text>
+  <text x="468" y="722" class="body">Then <tspan class="mono">Log_Tx</tspan> at 115200 baud prints</text>
+  <text x="468" y="742" class="body mono" style="font-size:13.5px">Download Image over UART2</text>
+</svg>

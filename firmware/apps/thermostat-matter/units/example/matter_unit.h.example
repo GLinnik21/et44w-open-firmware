@@ -1,0 +1,24 @@
+// Shape of units/<UNIT>/matter_unit.h (git-ignored). Never write it by hand: generate it with
+//   make MATTER=1 APP=apps/thermostat-matter UNIT=<unit> SERIAL=<serial> SETUP_TXT=<file> matter-unit
+// which runs tools/matter_setup.py --unit and writes the passcode / QR / manual code ONLY to SETUP_TXT (keep that
+// file outside the repo, e.g. secrets/<unit>_matter_setup.txt). The device gets the verifier, never the passcode.
+#ifndef MATTER_UNIT_H
+#define MATTER_UNIT_H
+
+#define MATTER_SERIAL_NUMBER "000000000001"
+#define MATTER_UNIQUE_ID "0123456789ABCDEF"     // random, 16 hex digits
+#define MATTER_VENDOR_ID 0xFFF1
+#define MATTER_PRODUCT_ID 0x8000
+#define MATTER_DISCOVERY_CAPABILITIES 0x04      // 0x02 = BLE, 0x04 = on-network, 0x06 = both
+#define MATTER_DISCRIMINATOR 1234
+#define MATTER_PBKDF_ITERATIONS 10000
+
+#define MATTER_PBKDF_SALT_LEN 32
+#define MATTER_PBKDF_SALT { 0 /* 32 random bytes */ }
+
+// SPAKE2+ verifier: w0 (32 bytes, big endian) and L (65 bytes, uncompressed SEC1 point).
+#define MATTER_SPAKE2P_W0 { 0 /* 32 bytes */ }
+
+#define MATTER_SPAKE2P_L { 0x04 /* 65 bytes */ }
+
+#endif

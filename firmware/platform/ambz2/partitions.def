@@ -1,0 +1,57 @@
+// AmebaZ2 (RTL8720CF) 2 MiB flash map: the single source of truth.
+//
+// Read by C (X-macro) and by tools/pack_image.py (regex). Keep it flat so both work:
+//   - one entry per line:  FLASH_PART(name, offset, size, owner)
+//   - offset/size are plain hex literals (no expressions), '//' comments only
+//   - entries sorted by offset and tiling 0..FLASH_TOTAL exactly (unused ranges get owner none)
+//
+// C usage:
+//   #define FLASH_TOTAL(size)
+//   #define FLASH_PART(name, offset, size, owner) ...
+//   #include "partitions.def"
+// owner: sdk = Realtek bootloader/ROM structure, app = our firmware, data = runtime data,
+//        none = unused/reserved (never written by us)
+//
+// Layout notes:
+//   - boot + both slots follow the SDK/stock layout (stock Tuya FW1 0x10000, FW2 0xF0000), so the
+//     Realtek bootloader needs only the partition-table records boot, FW1, FW2.
+//   - ota1/ota2 are 0xE0000 (896 KiB) each, 64 KiB aligned. The bootloader remaps XIP per slot, so
+//     both slots hold the same linked image (serial number decides which one boots).
+//   - factory: reserved for a read-only per-unit record. Unused so far: the HAP setup info is compiled in
+//       (tools/hap_setup.py -> hap_setup_info.h). Never inside a slot.
+//   - kv: Realtek DCT with backup. 12 modules x 4 KiB x2 (backup) = 96 KiB.
+//       needed: HAP domains 0x00,0x40,0x80,0x90,0x92,0xA0 (6) + Wi-Fi, OTA state, app (3) = 9
+//       modules, plus slack (the DCT may keep a module-name table; the closed lib_dct is unverified).
+//       dct_init(FLASH_kv_OFFSET, FLASH_KV_DCT_MODULES (12), 3, 128, /*backup*/1, /*wear_leveling*/0): variable
+//       names are 3 bytes (2 hex chars + NUL, libs/hap-pal-ambz2 HAPPlatformKeyValueStore.c). That is the
+//       on-flash format: changing it loses the stored pairings.
+//   - ota_state: one sector, written append-only (bits only cleared) by libs/ota; erased = no update
+//       on trial. Kept out of the DCT so a rollback never depends on the KV store.
+//   - matter: Matter builds only (MATTER=1): Realtek DCT second instance (dct_init2), 6 modules x 4 KiB
+//       x2 (backup) = 48 KiB: boot, node, m1..m4 (libs/matter-port-ambz2/src/store.c). HAP builds never
+//       touch it, and the Matter app never writes kv or ota_state.
+//   - sdk_reserved: the SDK's fixed sectors (platform_opts.h) all lie in 0x1F6000..0x1FFFFF:
+//       BT whitelist 0x1F6000/0x1F7000, BT static random 0x1FA000, UART_SETTING_SECTOR 0x1FB000,
+//       BT FTL 0x1FC000..0x1FE000, FAST_RECONNECT_DATA 0x1FF000. We keep that whole range out of
+//       the way: fast-reconnect never writes (platform/ambz2/src/sdk_glue.c leaves p_write_reconnect_ptr NULL;
+//       wifi_conf.c only reads FAST_RECONNECT_DATA), and the UART-setting backup belongs to the AT console,
+//       which isn't built.
+//       Exception: BT builds (BT=1, so every MATTER=1 build) run the BT stack's ftl_init at 0x1FC000,
+//       inside sdk_reserved (libs/ble-probe already does). Nothing of ours is placed there.
+//   - sdk_backup (0x3000) is the SDK's FLASH_BAKEUP_SECTOR.
+
+FLASH_TOTAL(0x200000)
+
+FLASH_PART(ptable,       0x000000, 0x001000, sdk)   // calibration pattern + partition table
+FLASH_PART(system,       0x001000, 0x001000, sdk)   // system data (SDK)
+FLASH_PART(calibration,  0x002000, 0x001000, sdk)   // flash calibration
+FLASH_PART(sdk_backup,   0x003000, 0x001000, sdk)   // FLASH_BAKEUP_SECTOR
+FLASH_PART(boot,         0x004000, 0x008000, sdk)   // bootloader image
+FLASH_PART(boot_spare,   0x00C000, 0x004000, none)  // unused (slot 1 starts 64 KiB aligned)
+FLASH_PART(ota1,         0x010000, 0x0E0000, app)   // FW1 slot
+FLASH_PART(ota2,         0x0F0000, 0x0E0000, app)   // FW2 slot
+FLASH_PART(factory,      0x1D0000, 0x001000, data)  // read-only setup record
+FLASH_PART(kv,           0x1D1000, 0x018000, data)  // Realtek DCT, 96 KiB
+FLASH_PART(ota_state,    0x1E9000, 0x001000, data)  // OTA trial-boot record (libs/ota)
+FLASH_PART(matter,       0x1EA000, 0x00C000, data)  // Matter store (libs/matter-port-ambz2, DCT2)
+FLASH_PART(sdk_reserved, 0x1F6000, 0x00A000, none)  // SDK fixed sectors, unused by us

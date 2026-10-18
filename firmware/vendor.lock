@@ -1,0 +1,5 @@
+# Vendored sources: path, upstream, commit. Clone shallow into firmware/vendor/; never edit.
+HomeKitADK https://github.com/apple/HomeKitADK.git fb201f98f5fdc7fef6a455054f08b59cca5d1ec8
+ameba-rtos-z2 https://github.com/Ameba-AIoT/ameba-rtos-z2.git 0ee0460bc2cfbb80d0ae2ff3e952d44a30b856ab
+# Reference only, not built: the PAL's Init APIs follow its port headers (libs/hap-pal-ambz2/CONTRACTS.md).
+esp-apple-homekit-adk https://github.com/espressif/esp-apple-homekit-adk.git 1371579deea70bf6f1b39a470cad1668f5c9400c

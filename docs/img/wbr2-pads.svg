@@ -1,0 +1,190 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="780" viewBox="0 0 880 780">
+  <title>Tuya WBR2 module, back side: flashing pads and edge pins</title>
+  <!--
+    Geometry sources
+    Outline and edge pins: Tuya "WBR2 Module Datasheet",
+      https://developer.tuya.com/en/docs/iot/wbr2-datasheet?id=K989h4vonmsey
+      (figure "WBR2 dimensions.png", https://images.tuyacn.com/goat/20200108/487b3e8af7f4484d8b3a1557ae00dd24.png)
+      - PCB 15 mm (W) x 18 mm (L), tolerance +/-0.35 mm; antenna area = top 6 mm
+      - bottom tab 3.5 mm high, inset 1.6 mm on each side (tab 11.8 mm wide)
+      - edge pads: two rows (odd pins on the back face, even pins on the front face),
+        2 mm pitch within a face, faces offset 1 mm; pad 1.0 mm x 2.5 mm
+      - back view (as seen, not see-through): pin n centre at 1.5 + n mm from the left edge,
+        pin 1 (3V3) on the left
+    Pads: measured from a straight-on photo of the module back (the only sharp straight-on
+      back view; others are angled or have wires on the pads). Deskewed by the top edge
+      (1.7 deg tilt), scaled by the module width (342 px = 15 mm, 22.8 px/mm, same scale used
+      vertically). Cross-checked against the datasheet's back-side drawing (a mirrored
+      see-through view): centres agree within 0.35 mm, the photo reading 0.2-0.35 mm lower.
+      Centres (x, y) in mm from the top-left corner, back view:
+      Log_Tx (4.48, 10.31), Log_Rx (4.45, 11.66), A_0 (9.70, 12.41), A_1 (9.72, 13.77),
+      pad dia ~0.8-0.95; C-ring centre (13.4, 9.0), outer r 1.95, inner r 0.87, centre dot
+      r 0.43, open towards the right edge; large via-stitched pad 5.76-8.78 x 10.04-13.28
+      (not in the datasheet drawing; sits under the RTL8720CF QFN on the front, so most
+      likely its ground pad).
+    Drawing scale: 24 px = 1 mm, origin (56, 120).
+  -->
+  <defs>
+    <style>
+      text { font-family: -apple-system, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #1d1d1f; }
+      .mono, .mono text { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+      .title { font-size: 22px; font-weight: 600; letter-spacing: -0.2px; }
+      .sub { font-size: 14px; fill: #6e6e73; }
+      .body { font-size: 14px; }
+      .b { font-weight: 600; }
+      .note { font-size: 13px; fill: #6e6e73; }
+      .num { font-size: 13px; fill: #8e8e93; text-anchor: middle; }
+      .pn { font-size: 13px; text-anchor: middle; }
+      .dim { fill: #8e8e93; }
+      .silk { font-size: 13px; fill: #aeaeb2; }
+      .mark { fill: #c7c7cc; }
+      .lead { fill: none; stroke: #aeaeb2; stroke-width: 1; }
+      .cu { fill: #dcdce0; }
+    </style>
+  </defs>
+
+  <!-- solid background so it never renders transparently on a dark page -->
+  <rect x="0" y="0" width="880" height="780" rx="14" fill="#ffffff"/>
+  <rect x="0.5" y="0.5" width="879" height="779" rx="14" fill="none" stroke="#e5e5ea"/>
+
+  <text x="32" y="48" class="title">Tuya WBR2 (RTL8720CF): back of the module</text>
+  <text x="32" y="72" class="sub">To scale. Outline and pins from Tuya's datasheet (15 × 18 mm); pads measured from a photo.</text>
+
+  <!-- module outline: body 15 x 14.5 mm, tab 11.8 x 3.5 mm -->
+  <path d="M56 120 H416 V468 H377.6 V552 H94.4 V468 H56 Z" fill="#f5f5f7" stroke="#d1d1d6" stroke-width="1"/>
+
+  <!-- antenna area: top 6 mm -->
+  <line x1="56.5" y1="264" x2="415.5" y2="264" stroke="#d1d1d6" stroke-width="1" stroke-dasharray="4 3"/>
+
+  <!-- markings (silkscreen) -->
+  <text x="92" y="238" class="mono mark" style="font-size:30px">102</text>
+  <text x="238" y="150" class="mono mark" style="font-size:19px">E469716</text>
+  <text x="257" y="176" class="mono mark" style="font-size:19px">BM8</text>
+  <text x="264" y="202" class="mono mark" style="font-size:19px">94V-0</text>
+
+  <!-- large via-stitched pad (likely ground) -->
+  <rect x="194.2" y="361" width="72.5" height="77.7" class="cu"/>
+  <g fill="#ffffff">
+    <circle cx="197.3" cy="368.9" r="1.8"/><circle cx="215.9" cy="368.9" r="1.8"/><circle cx="234.5" cy="368.9" r="1.8"/><circle cx="253.1" cy="368.9" r="1.8"/>
+    <circle cx="197.3" cy="388.9" r="1.8"/><circle cx="215.9" cy="388.9" r="1.8"/><circle cx="234.5" cy="388.9" r="1.8"/><circle cx="253.1" cy="388.9" r="1.8"/>
+    <circle cx="197.3" cy="409.0" r="1.8"/><circle cx="215.9" cy="409.0" r="1.8"/><circle cx="234.5" cy="409.0" r="1.8"/><circle cx="253.1" cy="409.0" r="1.8"/>
+    <circle cx="197.3" cy="429.0" r="1.8"/><circle cx="215.9" cy="429.0" r="1.8"/><circle cx="234.5" cy="429.0" r="1.8"/><circle cx="253.1" cy="429.0" r="1.8"/>
+  </g>
+  <text x="230.5" y="352" class="note" text-anchor="middle" style="fill:#8e8e93">GND (likely)</text>
+
+  <!-- C-shaped ring pad, opening towards the right edge -->
+  <path d="M403.53 357.06 A33.85 33.85 0 1 1 403.53 313.54" fill="none" stroke="#dcdce0" stroke-width="25.9"/>
+  <circle cx="377.6" cy="335.3" r="10.3" class="cu"/>
+
+  <!-- test pads -->
+  <circle cx="163.5" cy="367.4" r="10.4" fill="#0a6fdb"/>
+  <circle cx="162.8" cy="399.8" r="10.4" fill="#0a6fdb"/>
+  <circle cx="288.8" cy="417.8" r="10.4" fill="#8e3fd0"/>
+  <circle cx="289.3" cy="450.5" r="9.9" fill="#ffffff" stroke="#aeaeb2" stroke-width="1"/>
+
+  <!-- pad silkscreen -->
+  <g class="silk mono">
+    <text x="148" y="372" text-anchor="end">Log_Tx</text>
+    <text x="148" y="404" text-anchor="end">Log_Rx</text>
+    <text x="304" y="422">A_0</text>
+    <text x="304" y="441">A_1</text>
+  </g>
+  <!-- edge-pin silkscreen: odd pins only, rotated as on the board -->
+  <g class="silk mono">
+    <text transform="translate(111.5 456) rotate(90)">3V3</text>
+    <text transform="translate(159.5 456) rotate(90)">GND</text>
+    <text transform="translate(207.5 456) rotate(90)">A13</text>
+    <text transform="translate(255.5 456) rotate(90)">A14</text>
+    <text transform="translate(303.5 456) rotate(90)">A12</text>
+    <text transform="translate(351.5 456) rotate(90)">A11</text>
+  </g>
+
+  <!-- edge pads: odd pins on this face (solid), even pins on the front face (dashed) -->
+  <g fill="none" stroke="#c7c7cc" stroke-width="1" stroke-dasharray="3 2">
+    <rect x="130.5" y="490.5" width="19" height="59" rx="7"/>
+    <rect x="178.5" y="490.5" width="19" height="59" rx="7"/>
+    <rect x="226.5" y="490.5" width="19" height="59" rx="7"/>
+    <rect x="274.5" y="490.5" width="19" height="59" rx="7"/>
+    <rect x="322.5" y="490.5" width="19" height="59" rx="7"/>
+  </g>
+  <rect x="104" y="490" width="24" height="60" rx="8" fill="#e0322b"/>
+  <rect x="152" y="490" width="24" height="60" rx="8" fill="#1d1d1f"/>
+  <rect x="200" y="490" width="24" height="60" rx="8" fill="#8e3fd0"/>
+  <g fill="#d1d1d6">
+    <rect x="248" y="490" width="24" height="60" rx="8"/>
+    <rect x="296" y="490" width="24" height="60" rx="8"/>
+    <rect x="344" y="490" width="24" height="60" rx="8"/>
+  </g>
+
+  <!-- pin numbers and names -->
+  <g class="num">
+    <text x="116" y="570">1</text><text x="140" y="570">2</text><text x="164" y="570">3</text>
+    <text x="188" y="570">4</text><text x="212" y="570">5</text><text x="236" y="570">6</text>
+    <text x="260" y="570">7</text><text x="284" y="570">8</text><text x="308" y="570">9</text>
+    <text x="332" y="570">10</text><text x="356" y="570">11</text>
+  </g>
+  <g class="pn mono">
+    <text x="116" y="588" style="fill:#c4221c;font-weight:600">3V3</text>
+    <text x="164" y="588" style="font-weight:600">GND</text>
+    <text x="212" y="588" style="fill:#8e3fd0;font-weight:600">A13</text>
+    <text x="260" y="588" class="dim">A14</text>
+    <text x="308" y="588" class="dim">A12</text>
+    <text x="356" y="588" class="dim">A11</text>
+  </g>
+  <g class="pn mono">
+    <text x="140" y="606" style="fill:#aeaeb2">A19</text>
+    <text x="188" y="606" style="fill:#aeaeb2">A18</text>
+    <text x="236" y="606" style="fill:#aeaeb2">A17</text>
+    <text x="284" y="606" style="fill:#aeaeb2">A20</text>
+    <text x="332" y="606" style="fill:#aeaeb2">EN</text>
+  </g>
+
+  <!-- leaders -->
+  <path class="lead" d="M422 120 H428 V264 H422 M428 192 H480"/>
+  <path class="lead" d="M163.5 357 V270 H448 V250 H480"/>
+  <path class="lead" d="M173.2 399.8 H182 V280 H456 V304 H480"/>
+  <path class="lead" d="M288.8 407.4 V394 H448 V372 H480"/>
+  <path class="lead" d="M212 594 V630 H448 V482 H480"/>
+  <path class="lead" d="M116 594 V656 M164 594 V656 M116 656 H464 V566 H480"/>
+
+  <!-- callouts -->
+  <text x="488" y="197" class="body" style="fill:#6e6e73">Antenna area (top 6 mm)</text>
+  <text x="488" y="215" class="note">PCB trace antenna on the front side</text>
+
+  <text x="488" y="255" class="body"><tspan class="mono b" style="fill:#0a6fdb">Log_Tx</tspan><tspan dx="6">→ adapter RX</tspan></text>
+  <text x="488" y="273" class="note">flash / log UART, output</text>
+
+  <text x="488" y="309" class="body"><tspan class="mono b" style="fill:#0a6fdb">Log_Rx</tspan><tspan dx="6">← adapter TX</tspan></text>
+  <text x="488" y="327" class="note">flash / log UART, input</text>
+
+  <text x="488" y="377" class="body"><tspan class="mono b" style="fill:#8e3fd0">A_0</tspan><tspan dx="6">HIGH at power-up</tspan></text>
+  <text x="488" y="395" class="note">PA00, the download strap. On this board it is</text>
+  <text x="488" y="412" class="note">driven by the adapter's GPIO, e.g. the</text>
+  <text x="488" y="429" class="note">Flipper's RTS/DTR pin.</text>
+
+  <text x="488" y="487" class="body"><tspan class="mono b" style="fill:#8e3fd0">A13</tspan><tspan dx="6">(pin 5) to 3.3 V</tspan></text>
+  <text x="488" y="505" class="note">Touch it to 3.3 V before power-up, release</text>
+  <text x="488" y="522" class="note">after. UART0 RX, the link to the thermostat MCU;</text>
+  <text x="488" y="539" class="note">its partner A14 (pin 7) is UART0 TX.</text>
+
+  <text x="488" y="571" class="body"><tspan class="mono b" style="fill:#c4221c">3V3</tspan> / <tspan class="mono b">GND</tspan><tspan dx="6">(pins 1, 3)</tspan></text>
+  <text x="488" y="589" class="note">Same rail as P1 VCC / GND on the front</text>
+  <text x="488" y="606" class="note">board, so they are alternative power points.</text>
+
+  <!-- scale bar: 5 mm = 120 px -->
+  <g stroke="#6e6e73" stroke-width="1">
+    <line x1="56" y1="684" x2="176" y2="684"/>
+    <line x1="56" y1="679" x2="56" y2="689"/>
+    <line x1="80" y1="681" x2="80" y2="687"/>
+    <line x1="104" y1="681" x2="104" y2="687"/>
+    <line x1="128" y1="681" x2="128" y2="687"/>
+    <line x1="152" y1="681" x2="152" y2="687"/>
+    <line x1="176" y1="679" x2="176" y2="689"/>
+  </g>
+  <text x="188" y="689" class="note">5 mm</text>
+  <text x="250" y="689" class="note">Back view, pin 1 on the left. Grey parts are not used for flashing.</text>
+
+  <text x="32" y="718" class="note">Log_Tx, Log_Rx, A_0 and A_1 exist only as pads on the back, not as edge pins.</text>
+  <text x="32" y="738" class="note">Solid bars = edge pads on this face (odd pins); dashed = even pins, on the front face.</text>
+  <text x="32" y="758" class="note">The module stands upright, its edge pins soldered into the front board.</text>
+</svg>

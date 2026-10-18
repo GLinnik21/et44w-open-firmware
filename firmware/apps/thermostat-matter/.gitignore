@@ -1,0 +1,4 @@
+# Per-device secrets (see the .example files)
+units/*/matter_unit.h
+wifi_credentials.h
+ota_pubkey.h

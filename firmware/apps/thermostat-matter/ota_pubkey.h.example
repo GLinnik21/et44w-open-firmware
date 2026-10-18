@@ -1,0 +1,18 @@
+// Placeholder: don't copy it. Generate the real ota_pubkey.h (git-ignored) from the repo root with
+//   python3 firmware/tools/ota_keygen.py secrets/ota_signing.key firmware/apps/thermostat-matter/ota_pubkey.h
+// (first key ever), or, when secrets/ota_signing.key already exists (the tool won't overwrite it),
+//   python3 firmware/tools/ota_keygen.py --header-only secrets/ota_signing.key firmware/apps/thermostat-matter/ota_pubkey.h
+// The all-zero key is NOT safe: it is a small-order point, under which forged signatures verify. libs/ota
+// refuses every upload with it, and this file stops the build if it is copied unchanged.
+#error "ota_pubkey.h is the .example placeholder: generate it with tools/ota_keygen.py (see the comment above)"
+#ifndef OTA_PUBKEY_H
+#define OTA_PUBKEY_H
+
+#define OTA_PUBLIC_KEY_INIT { \
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
+}
+
+#endif

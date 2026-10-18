@@ -1,0 +1,199 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="700" viewBox="0 0 880 700">
+  <title>ET-44W front board, display side: header P1 and socket XP1 on the right edge</title>
+  <defs>
+    <style>
+      text { font-family: -apple-system, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #1d1d1f; }
+      .mono, .mono text { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+      .title { font-size: 22px; font-weight: 600; letter-spacing: -0.2px; }
+      .sub { font-size: 14px; fill: #6e6e73; }
+      .co { font-size: 14px; }
+      .co2 { font-size: 13px; fill: #6e6e73; }
+      .b { font-weight: 600; }
+      .silk { font-size: 13px; font-weight: 600; fill: #5f7a68; }
+      .tag { font-size: 13px; font-weight: 600; fill: #1d1d1f; }
+      .lead { fill: none; stroke: #8e8e93; stroke-width: 1; }
+      .dot { fill: #8e8e93; }
+      .on { fill: #f1e9cf; }
+      .off { fill: #3a3a3c; }
+    </style>
+  </defs>
+
+  <!-- solid background so it never renders transparently on a dark page -->
+  <rect x="0" y="0" width="880" height="700" rx="14" fill="#ffffff"/>
+  <rect x="0.5" y="0.5" width="879" height="699" rx="14" fill="none" stroke="#e5e5ea"/>
+
+  <text x="32" y="48" class="title">Front board, display side: find <tspan class="mono">P1</tspan></text>
+  <text x="32" y="72" class="sub">Traced from a photo of board ET-44W.AX V3.0. P1's holes go through, so it is reachable from either side.</text>
+
+  <!-- board geometry is traced from a photo; the group only shifts it -->
+  <g transform="translate(-28,72)">
+    <!-- board -->
+    <rect x="60" y="90" width="490" height="488" rx="10" fill="#e6eee8" stroke="#b9cabd" stroke-width="1"/>
+    <g fill="#ffffff" stroke="#b9cabd" stroke-width="1">
+      <circle cx="92" cy="122" r="10"/>
+      <circle cx="520" cy="122" r="10"/>
+      <circle cx="302" cy="548" r="10"/>
+    </g>
+    <text x="200" y="127" class="silk mono">TY 2338</text>
+    <text x="78" y="564" class="silk">ET-44W.AX V3.0</text>
+
+    <!-- WBR2 module, seen edge-on, and its 11 pins in two staggered rows.
+         Pin 1 (3V3) = right end of the inner row, nearest P1. Odd pins: inner row (next to the display); even pins: edge row.
+         A13 (pin 5) = 3rd from the right in the inner row (x 406.5). -->
+    <rect x="326.5" y="117" width="145" height="8" rx="2" fill="#aeaeb2"/>
+    <g fill="#ffffff" stroke="#8e8e93" stroke-width="1">
+      <rect x="452.5" y="126" width="7" height="12" rx="1.5"/>
+      <rect x="441.0" y="104" width="7" height="12" rx="1.5"/>
+      <rect x="429.5" y="126" width="7" height="12" rx="1.5"/>
+      <rect x="418.0" y="104" width="7" height="12" rx="1.5"/>
+      <rect x="395.0" y="104" width="7" height="12" rx="1.5"/>
+      <rect x="383.5" y="126" width="7" height="12" rx="1.5"/>
+      <rect x="372.0" y="104" width="7" height="12" rx="1.5"/>
+      <rect x="360.5" y="126" width="7" height="12" rx="1.5"/>
+      <rect x="349.0" y="104" width="7" height="12" rx="1.5"/>
+      <rect x="337.5" y="126" width="7" height="12" rx="1.5"/>
+    </g>
+    <rect x="406.5" y="126" width="7" height="12" rx="1.5" fill="#8e3fd0"/>
+
+    <!-- display -->
+    <rect x="160" y="152" width="292" height="184" rx="6" fill="#2c2c2e"/>
+    <!-- 7-segment display showing 22.5, segments slanted like the real one -->
+    <g transform="translate(306 244) skewX(-7) translate(-306 -244)">
+      <polygon points="189.1,191.5 194.6,186.0 233.4,186.0 238.9,191.5 233.4,197.0 194.6,197.0" class="on"/>
+      <polygon points="240.5,193.1 246.0,198.6 246.0,236.9 240.5,242.4 235.0,236.9 235.0,198.6" class="on"/>
+      <polygon points="240.5,245.6 246.0,251.1 246.0,289.4 240.5,294.9 235.0,289.4 235.0,251.1" class="off"/>
+      <polygon points="189.1,296.5 194.6,291.0 233.4,291.0 238.9,296.5 233.4,302.0 194.6,302.0" class="on"/>
+      <polygon points="187.5,245.6 193.0,251.1 193.0,289.4 187.5,294.9 182.0,289.4 182.0,251.1" class="on"/>
+      <polygon points="187.5,193.1 193.0,198.6 193.0,236.9 187.5,242.4 182.0,236.9 182.0,198.6" class="off"/>
+      <polygon points="189.1,244.0 194.6,238.5 233.4,238.5 238.9,244.0 233.4,249.5 194.6,249.5" class="on"/>
+      <circle cx="256.0" cy="296.5" r="6.0" class="off"/>
+      <polygon points="281.1,191.5 286.6,186.0 325.4,186.0 330.9,191.5 325.4,197.0 286.6,197.0" class="on"/>
+      <polygon points="332.5,193.1 338.0,198.6 338.0,236.9 332.5,242.4 327.0,236.9 327.0,198.6" class="on"/>
+      <polygon points="332.5,245.6 338.0,251.1 338.0,289.4 332.5,294.9 327.0,289.4 327.0,251.1" class="off"/>
+      <polygon points="281.1,296.5 286.6,291.0 325.4,291.0 330.9,296.5 325.4,302.0 286.6,302.0" class="on"/>
+      <polygon points="279.5,245.6 285.0,251.1 285.0,289.4 279.5,294.9 274.0,289.4 274.0,251.1" class="on"/>
+      <polygon points="279.5,193.1 285.0,198.6 285.0,236.9 279.5,242.4 274.0,236.9 274.0,198.6" class="off"/>
+      <polygon points="281.1,244.0 286.6,238.5 325.4,238.5 330.9,244.0 325.4,249.5 286.6,249.5" class="on"/>
+      <circle cx="348.0" cy="296.5" r="6.0" class="on"/>
+      <polygon points="373.1,191.5 378.6,186.0 417.4,186.0 422.9,191.5 417.4,197.0 378.6,197.0" class="on"/>
+      <polygon points="424.5,193.1 430.0,198.6 430.0,236.9 424.5,242.4 419.0,236.9 419.0,198.6" class="off"/>
+      <polygon points="424.5,245.6 430.0,251.1 430.0,289.4 424.5,294.9 419.0,289.4 419.0,251.1" class="on"/>
+      <polygon points="373.1,296.5 378.6,291.0 417.4,291.0 422.9,296.5 417.4,302.0 378.6,302.0" class="on"/>
+      <polygon points="371.5,245.6 377.0,251.1 377.0,289.4 371.5,294.9 366.0,289.4 366.0,251.1" class="off"/>
+      <polygon points="371.5,193.1 377.0,198.6 377.0,236.9 371.5,242.4 366.0,236.9 366.0,198.6" class="on"/>
+      <polygon points="373.1,244.0 378.6,238.5 417.4,238.5 422.9,244.0 417.4,249.5 378.6,249.5" class="on"/>
+      <circle cx="440.0" cy="296.5" r="6.0" class="off"/>
+    </g>
+
+    <!-- LEDs -->
+    <g fill="none" stroke="#8fa696" stroke-width="1">
+      <rect x="200" y="384" width="34" height="14" rx="2"/>
+      <rect x="368" y="384" width="34" height="14" rx="2"/>
+    </g>
+    <rect x="211" y="387" width="12" height="8" rx="1" fill="#f5e7a8"/>
+    <rect x="379" y="387" width="12" height="8" rx="1" fill="#f5e7a8"/>
+    <text x="217" y="418" class="silk" text-anchor="middle">LED1</text>
+    <text x="385" y="418" class="silk" text-anchor="middle">LED2</text>
+
+    <!-- spring keys -->
+    <g fill="#dbe6de" stroke="#a9bdaf" stroke-width="1.5">
+      <circle cx="128" cy="486" r="46"/><circle cx="302" cy="486" r="46"/><circle cx="472" cy="486" r="46"/>
+    </g>
+    <g fill="none" stroke="#b9cabd" stroke-width="1">
+      <circle cx="128" cy="486" r="32"/><circle cx="302" cy="486" r="32"/><circle cx="472" cy="486" r="32"/>
+    </g>
+    <g fill="#cfdcd2">
+      <circle cx="128" cy="486" r="18"/><circle cx="302" cy="486" r="18"/><circle cx="472" cy="486" r="18"/>
+    </g>
+    <text x="128" y="432" class="silk" text-anchor="middle">K1</text>
+    <text x="302" y="432" class="silk" text-anchor="middle">K2</text>
+    <text x="472" y="432" class="silk" text-anchor="middle">K3</text>
+
+    <!-- right edge: P1 (through-holes, VCC = square pad) and XP1 (solder joints of the socket on the back) -->
+    <rect x="508" y="154" width="34" height="126" rx="3" fill="none" stroke="#8fa696" stroke-width="1"/>
+    <rect x="508" y="288" width="34" height="122" rx="3" fill="none" stroke="#8fa696" stroke-width="1"/>
+    <!-- P1 -->
+    <g stroke="#a1a1a6" stroke-width="1">
+      <circle cx="525" cy="170" r="9" fill="#ffffff"/>
+      <circle cx="525" cy="201" r="9" fill="#ffffff"/>
+      <rect x="516" y="254" width="18" height="18" rx="1.5" fill="#ffffff"/>
+    </g>
+    <circle cx="525" cy="232" r="9" fill="#1d1d1f"/>
+    <g fill="#d1d1d6">
+      <circle cx="525" cy="170" r="3.5"/><circle cx="525" cy="201" r="3.5"/><circle cx="525" cy="263" r="3.5"/>
+    </g>
+    <circle cx="525" cy="232" r="3.5" fill="#ffffff"/>
+    <!-- XP1 joints: filled solder, no hole -->
+    <g fill="#c7c7cc">
+      <circle cx="525" cy="304" r="8"/><circle cx="525" cy="335" r="8"/><circle cx="525" cy="366" r="8"/>
+    </g>
+    <circle cx="525" cy="397" r="8" fill="#e0322b"/>
+    <g fill="#ffffff" opacity="0.55">
+      <circle cx="522" cy="301" r="2.5"/><circle cx="522" cy="332" r="2.5"/><circle cx="522" cy="363" r="2.5"/><circle cx="522" cy="394" r="2.5"/>
+    </g>
+    <g class="silk" text-anchor="end">
+      <text x="502" y="175">DA</text>
+      <text x="502" y="206">CK</text>
+      <text x="502" y="237">GND</text>
+      <text x="502" y="268">VCC</text>
+      <text x="502" y="309">Fs</text>
+      <text x="502" y="340">RL</text>
+      <text x="502" y="402">VCC</text>
+    </g>
+    <text x="525" y="147" class="tag mono" text-anchor="middle">P1</text>
+    <text x="525" y="428" class="tag mono" text-anchor="middle">XP1</text>
+
+    <!-- callouts: leaders end at x 616, text column at x 628 (abs 600) -->
+    <!-- A13 -->
+    <path class="lead" d="M 410 124 L 410 40 L 616 40"/>
+    <circle class="dot" cx="410" cy="124" r="2.5" style="fill:#8e3fd0"/>
+    <text x="628" y="45" class="co"><tspan class="mono b" style="fill:#8e3fd0">A13</tspan><tspan dx="7">WBR2 edge pin 5</tspan></text>
+    <text x="628" y="63" class="co2">Inner row, 3rd pin from the right.</text>
+    <text x="628" y="80" class="co2">Touch 3.3 V before power-up, release after.</text>
+
+    <!-- WBR2 pins: elbow over the mounting hole -->
+    <path class="lead" d="M 471.5 121 L 486 121 L 498 104 L 616 104"/>
+    <circle class="dot" cx="471.5" cy="121" r="2.5"/>
+    <text x="628" y="109" class="co"><tspan class="b">WBR2 module</tspan>, 11 pins</text>
+    <text x="628" y="127" class="co2">Pin 1 (<tspan class="mono">3V3</tspan>) is the right end, nearest P1.</text>
+
+    <!-- DA, CK -->
+    <path class="lead" d="M 548 170 L 552 170 L 552 201 L 548 201 M 552 185.5 L 616 185.5"/>
+    <text x="628" y="181" class="co"><tspan class="mono b">DA</tspan>, <tspan class="mono b">CK</tspan><tspan dx="7">Don't connect</tspan></text>
+    <text x="628" y="199" class="co2">Programming port of the CBM7326 MCU</text>
+
+    <!-- GND -->
+    <path class="lead" d="M 548 232 L 616 232"/>
+    <circle class="dot" cx="548" cy="232" r="2.5" style="fill:#1d1d1f"/>
+    <text x="628" y="237" class="co"><tspan class="mono b">GND</tspan><tspan dx="7">Solder the adapter's ground</tspan></text>
+
+    <!-- P1 VCC -->
+    <path class="lead" d="M 548 263 L 616 263"/>
+    <circle class="dot" cx="548" cy="263" r="2.5"/>
+    <text x="628" y="268" class="co"><tspan class="mono b">P1 VCC</tspan><tspan dx="7" style="fill:#6e6e73">Same trace as XP1 VCC; unused</tspan></text>
+
+    <!-- XP1 joints -->
+    <path class="lead" d="M 548 304 L 552 304 L 552 366 L 548 366 M 552 335 L 616 335"/>
+    <text x="628" y="322" class="co"><tspan class="mono b">XP1</tspan><tspan dx="7">Solder joints only</tspan></text>
+    <text x="628" y="340" class="co2">Socket on the back side, to the mains</text>
+    <text x="628" y="357" class="co2">base. Fs floor sensor, RL relay, –, VCC.</text>
+
+    <!-- XP1 VCC -->
+    <path class="lead" d="M 548 397 L 616 397"/>
+    <circle class="dot" cx="548" cy="397" r="2.5" style="fill:#e0322b"/>
+    <text x="628" y="402" class="co"><tspan class="mono b" style="fill:#c4221c">XP1 VCC</tspan><tspan dx="7">3.3 V jump wire</tspan></text>
+    <text x="628" y="420" class="co2">Into the socket on the back, at the</text>
+    <text x="628" y="437" class="co2">end farthest from P1.</text>
+
+    <!-- legend -->
+    <line x1="628" y1="476" x2="852" y2="476" stroke="#e5e5ea"/>
+    <circle cx="636" cy="501" r="6" fill="#e0322b"/>
+    <text x="652" y="506" class="co2" style="fill:#1d1d1f">Adapter 3.3 V</text>
+    <circle cx="636" cy="527" r="6" fill="#1d1d1f"/>
+    <text x="652" y="532" class="co2" style="fill:#1d1d1f">Adapter GND</text>
+    <rect x="632.5" y="546" width="7" height="12" rx="1.5" fill="#8e3fd0"/>
+    <text x="652" y="558" class="co2" style="fill:#1d1d1f">Touch 3.3 V at power-up</text>
+    <circle cx="636" cy="579" r="5.5" fill="#ffffff" stroke="#a1a1a6"/>
+    <text x="652" y="584" class="co2" style="fill:#1d1d1f">Leave unconnected</text>
+  </g>
+</svg>
