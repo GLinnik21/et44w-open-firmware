@@ -69,9 +69,21 @@ static void s0_task(void *arg) {
         }
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
-    bool ota = tcp_answers(OTA_PORT);
-    unsigned free_b = (unsigned) xPortGetFreeHeapSize(), min_b = (unsigned) xPortGetMinimumEverFreeHeapSize();
-    bool ok = ota && free_b >= HEALTH_HEAP_FREE_MIN && min_b >= HEALTH_HEAP_EVER_MIN;
+    // IP usually comes from a commissioning still in progress (BLE, PASE and CASE all hold heap): resample until the
+    // heap recovers or HEALTH_HEAP_RETRY_MS passes (the trial deadline leaves room for it).
+    uint32_t until = uptime_ms() + HEALTH_HEAP_RETRY_MS;
+    bool ota, ok;
+    unsigned free_b, min_b;
+    for (;;) {
+        ota = tcp_answers(OTA_PORT);
+        free_b = (unsigned) xPortGetFreeHeapSize();
+        min_b = (unsigned) xPortGetMinimumEverFreeHeapSize();
+        ok = ota && free_b >= HEALTH_HEAP_FREE_MIN && min_b >= HEALTH_HEAP_EVER_MIN;
+        if (ok || (int32_t) (uptime_ms() - until) >= 0) {
+            break;
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
     printf("S0: %s at %lu s: ota %d, heap free %u min %u%s\n", ok ? "passed" : "FAILED",
            (unsigned long) (uptime_ms() / 1000), (int) ota, free_b, min_b,
            !ok ? " -> not confirming" : confirm_hook ? " -> confirming" : " (OTA_TEST: not confirming)");

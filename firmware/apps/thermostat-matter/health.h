@@ -13,6 +13,7 @@
 #define HEALTH_THERMO_MS      60000u        // the MCU must have reported by then
 #define HEALTH_NET_MS         180000u       // IP, UDP 5540 and the node by then, counted from boot or from the end of an
                                             // offline BLE window (leaves the trial >= 2 min to confirm)
+#define HEALTH_HEAP_RETRY_MS  60000u        // the check can land mid-commissioning (BLE + PASE + CASE): resample this long
 #define HEALTH_COMMISSION_LOG_MS 5000u
 
 // main(): creates the self-check task. It confirms the OTA trial (libs/ota-test hook) once IP is up, UDP 5540 is
