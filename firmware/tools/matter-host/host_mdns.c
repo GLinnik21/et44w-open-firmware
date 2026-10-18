@@ -120,7 +120,8 @@ void mh_mdns_sync(const mt_node *n)
         for (unsigned c = 0; c < MT_NODE_MDNS_MAX; c++) {
             if (g_ch[c].pid) continue;
             g_ch[c].pid = spawn(argvs[i], c);
-            snprintf(g_ch[c].key, sizeof g_ch[c].key, "%s", want[i]);
+            _Static_assert(sizeof g_ch[c].key == sizeof want[i], "key holds a whole want entry");
+            memcpy(g_ch[c].key, want[i], sizeof g_ch[c].key);
             printf("mdns: register %s(pid %d)\n", want[i], (int)g_ch[c].pid);
             break;
         }
