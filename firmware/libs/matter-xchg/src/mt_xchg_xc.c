@@ -133,7 +133,7 @@ static mt_err build(mt_xchg *m, mt_xchg_session *s, uint8_t *buf, size_t cap, co
     if (e != MT_OK) return e;
     e = mt_proto_hdr_encode(ph, mt_buf_of(buf + hl, cap - hl), &pl);
     if (e != MT_OK) return e;
-    memcpy(buf + hl + pl, payload.p, payload.len);
+    if (payload.len) memcpy(buf + hl + pl, payload.p, payload.len); /* payload.p may be NULL when empty */
     if (!sec) { *len = hl + pl + payload.len; return MT_OK; }
     return mt_msg_seal(s->enc_key, s->local_node, &h, mt_buf_of(buf, cap), hl, pl + payload.len, len);
 }

@@ -308,7 +308,7 @@ static void test_fabrics(void)
     CHECK(fabric_is(&k, 1, 1, 0));                                  /* not applied before finish */
     CHECK(!memcmp(before, F.mod[live], sizeof before));
     CHECK(k.ops.finish(&k, true) == MT_OK);
-    CHECK(MTP_MOD_F0 + k.map.e[0].mod != live && mod_empty(live));
+    CHECK((unsigned) (MTP_MOD_F0 + k.map.e[0].mod) != live && mod_empty(live));
     CHECK(fabric_is(&k, 1, 1, 2));
     boot(&k);
     CHECK(fabric_is(&k, 1, 1, 2));

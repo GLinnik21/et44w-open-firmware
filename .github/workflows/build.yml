@@ -20,6 +20,8 @@ jobs:
     defaults:
       run:
         working-directory: firmware
+    env:
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1   # undefined behaviour fails the tests, not just a log line
     steps:
       - uses: actions/checkout@v4
 

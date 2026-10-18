@@ -125,7 +125,7 @@ static const struct vec *issuer_of(const mt_cert *c)
     for (size_t i = 0; i < NVECS; i++) {
         mt_cert p;
         if (mt_cert_decode(mt_span_of(VECS[i].tlv, VECS[i].tlv_len), &p)) continue;
-        if (p.skid.len == c->akid.len && !memcmp(p.skid.p, c->akid.p, p.skid.len)) return &VECS[i];
+        if (p.skid.len == c->akid.len && (!p.skid.len || !memcmp(p.skid.p, c->akid.p, p.skid.len))) return &VECS[i];
     }
     return NULL;
 }
